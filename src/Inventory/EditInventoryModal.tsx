@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Modal } from '../ui/Modal';
-import { Input } from '../ui/Input';
-import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
-import { formatCurrency } from '../../utils/calculations';
-import { InventoryItemAd } from '../../utils/types';
+import { Modal } from '../components/ui/Modal';
+import { Input } from '../components/ui/Input';
+import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
+import { formatCurrency } from '../utils/calculations';
+import { InventoryItemAd } from '../utils/types';
 
 
 interface EditInventoryModalProps {
@@ -29,7 +29,7 @@ export const EditInventoryModal: React.FC<EditInventoryModalProps> = ({
     if (item) {
       setPrecio(item.precio);
       setStock(item.stock);
-      setCodigoBarras(item.Cod_var_bar);
+      setCodigoBarras(item.cod_var_bar);
       setErrors({});
     }
   }, [item]);
@@ -60,7 +60,7 @@ export const EditInventoryModal: React.FC<EditInventoryModalProps> = ({
       ...item,
       precio,
       stock,
-      Cod_var_bar: codigoBarras,
+      cod_var_bar: codigoBarras,
       updated_at: new Date().toISOString(),
     };
 

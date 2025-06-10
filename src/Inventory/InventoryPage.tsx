@@ -7,8 +7,7 @@ import { Table, TableHead, TableBody, TableRow, TableCell } from '../components/
 import { Badge } from '../components/ui/Badge';
 import { Card } from '../components/ui/Card';
 import { Select } from '../components/ui/Select';
-import { EditInventoryModal } from '../components/modals/EditInventoryModal';
-import { formatCurrency } from '../utils/calculations';
+import { EditInventoryModal } from './EditInventoryModal';
 import { fetchInventarioAvanzado, fetchOpcionesFiltros, fetchUpsertInventario } from '../utils/api';
 import { InventoryItemAd } from '../utils/types';
 
@@ -16,8 +15,7 @@ import { InventoryItemAd } from '../utils/types';
 export const InventoryPage: React.FC = () => {
 
   const [inventory, setInventory] = useState<InventoryItemAd[]>([]);
-  const [filteredInventory, setFilteredInventory] = useState<InventoryItemAd[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
   const [stockFilter, setStockFilter] = useState<'all' | 'in-stock' | 'low-stock' | 'out-of-stock'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(100);
@@ -55,12 +53,6 @@ useEffect(() => {
       );
 
       setInventory(data);
-      setTotalItems(data.length);
-
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      const currentSlice = data.slice(startIndex, endIndex);
-      setCurrentItems(currentSlice);
     } catch (err) {
       console.error('Error cargando inventario:', err);
     }
@@ -141,20 +133,7 @@ const handleInlineChange = (id: number, field: keyof InventoryItemAd, value: any
     },
   }));
 };
-
-
-    const handleInlineSave = async (id: number) => {
-  const item = inventory.find(i => i.id === id);
-  if (!item) return;
-
-  const success = await fetchUpsertInventario(item);
-  if (!success) {
-    alert(`Error al guardar cambios para el item con ID ${id}`);
-  }
-};
-
-
-
+   
   return (
     <PageLayout title="Inventario">
       <div className="space-y-6">
@@ -207,14 +186,14 @@ const handleInlineChange = (id: number, field: keyof InventoryItemAd, value: any
 ).map(([label, lista, valor, setter]) => (
   <div key={`filtro-${label}`} className="flex flex-wrap items-center gap-2">
     <strong>{label}:</strong>
-    <Button size="sm" variant={!valor ? 'default' : 'outline'} onClick={() => setter(null)}>
+    <Button size="sm" variant={!valor ? 'ghost' : 'outline'} onClick={() => setter(null)}>
       Todos
     </Button>
     {lista.map(item => (
       <Button
         key={item}
         size="sm"
-        variant={valor === item ? 'default' : 'outline'}
+        variant={valor === item ? 'ghost' : 'outline'}
         onClick={() => setter(item)}
       >
         {item}
