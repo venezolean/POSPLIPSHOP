@@ -269,12 +269,12 @@ const handleInlineChange = (id: number, field: keyof InventoryItemAd, value: any
           <Table striped hoverable>
             <TableHead>
               <TableRow>
-                <TableCell header>SKU</TableCell>
+                
                 <TableCell header>Nombre</TableCell>
                 <TableCell header>Características</TableCell>
                 <TableCell header align="center">Stock</TableCell>
                 <TableCell header align="right">Precio</TableCell>
-                <TableCell header>Código de Barras</TableCell>
+                <TableCell header>Link</TableCell>
                 <TableCell header align="center">Acciones</TableCell>
               </TableRow>
             </TableHead>
@@ -288,7 +288,7 @@ const handleInlineChange = (id: number, field: keyof InventoryItemAd, value: any
               ) : (
                 currentItems.map((item) => (
                   <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.sku}</TableCell>
+                    
                     <TableCell>{item.nombre}</TableCell>
                     <TableCell className="max-w-xs truncate" >
                       {formatCharacteristics(item.caracteristicas)}
@@ -341,7 +341,24 @@ const handleInlineChange = (id: number, field: keyof InventoryItemAd, value: any
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono text-sm">{item.cod_var_bar}
+                    <TableCell className="font-mono text-sm"><input
+    type="text"
+    defaultValue={item.link ?? ''}
+    className="w-40 text-right border rounded px-1 py-0.5"
+    onChange={(e) =>
+      handleInlineChange(item.id, 'link', e.target.value)
+    }
+    onKeyDown={(e) => {
+      if (e.key === 'Enter') {
+        const itemToUpdate = editingItem[item.id];
+        if (itemToUpdate) fetchUpsertInventario({ id: item.id, ...itemToUpdate });
+      }
+    }}
+    onBlur={() => {
+      const itemToUpdate = editingItem[item.id];
+      if (itemToUpdate) fetchUpsertInventario({ id: item.id, ...itemToUpdate });
+    }}
+  />
                     </TableCell>
                     
                     <TableCell align="center">

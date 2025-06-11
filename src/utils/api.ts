@@ -12,6 +12,7 @@ export async function fetchSuggestions(term: string): Promise<ProductoBusqueda[]
   return data as ProductoBusqueda[];
 }
 
+//Registrar ventas
 
 export async function registrarVenta(params: RegistrarVentaParams): Promise<number | null> {
   const { data, error } = await supabase.rpc('registrar_venta', {
@@ -28,17 +29,6 @@ export async function registrarVenta(params: RegistrarVentaParams): Promise<numb
   return data; // Devuelve el ID de la venta registrada
 }
 
-// funcion para inventario
-export async function fetchInventario(term: string = ''): Promise<InventoryItemAd[]> {
-  const { data, error } = await supabase.rpc('buscar_inventario', { term });
-
-  if (error) {
-    console.error('Error al obtener inventario:', error.message);
-    return [];
-  }
-
-  return data as InventoryItemAd[];
-}
 
 
 //inventario avanzado
@@ -70,32 +60,6 @@ export async function fetchInventarioAvanzado(
 
 
 
-export async function contarInventarioAvanzado(
-  term: string = '',
-  stockFilter: 'all' | 'in-stock' | 'low-stock' | 'out-of-stock' = 'all',
-  categoria: string | null = null,
-  subcategoria: string | null = null,
-  rubro: string | null = null,
-  temporada: string | null = null
-): Promise<number> {
-  const { data, error } = await supabase.rpc('contar_inventario_avanzado', {
-    term,
-    stock_filter: stockFilter,
-    p_categoria: categoria,
-    p_subcategoria: subcategoria,
-    p_rubro: rubro,
-    p_temporada: temporada,
-  });
-
-  if (error) {
-    console.error('Error al contar inventario:', error.message);
-    return 0;
-  }
-
-  return data;
-}
-
-
 
 export async function fetchOpcionesFiltros(): Promise<{
   rubros: string[];
@@ -121,7 +85,7 @@ export async function fetchUpsertInventario(item: Partial<InventoryItemAd> & { i
     .update({
       stock: item.stock,
       precio: item.precio,
-      cod_var_bar: item.cod_var_bar,
+      link: item.link,
       updated_at: new Date().toISOString(),
     })
     .eq('id', item.id);
@@ -133,3 +97,6 @@ export async function fetchUpsertInventario(item: Partial<InventoryItemAd> & { i
     console.log(`Cambios guardados correctamente para ID ${item.id}`);
   }
 }
+
+
+//

@@ -103,24 +103,7 @@ export type RegistrarVentaParams = {
 };
 
 
-//inventario items
 
-
-export interface InventoryItem {
-  id: number;
-  producto_id: number;
-  sku: string;
-  caracteristicas: Record<string, any>;
-  stock: number;
-  precio: number;
-  editable: boolean;
-  created_at: string;
-  created_by: string;
-  updated_at: string;
-  updated_by: string;
-  nombre: string;
-  Cod_var_bar: string;
-}
 // invetario avanzado
 export interface InventoryItemAd {
   id: number;
@@ -136,6 +119,7 @@ export interface InventoryItemAd {
   updated_by: string;
   nombre: string;
   cod_var_bar: string;
+  link: string | null;
   categoria: string;
   subcategoria: string;
   rubro: string;
