@@ -341,7 +341,7 @@ const handleInlineChange = (id: number, field: keyof InventoryItemAd, value: any
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono text-sm"><input
+                    <TableCell className="font-mono text-sm">{item.link ?? ''}<input
     type="text"
     defaultValue={item.link ?? ''}
     className="w-40 text-right border rounded px-1 py-0.5"
