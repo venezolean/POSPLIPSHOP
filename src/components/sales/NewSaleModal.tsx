@@ -197,7 +197,7 @@ const handleSaveDraft = () => {
             <p className="text-xs">Av. Jujuy 50</p>
           </div>
           <div className="w-1/3">
-            <CustomerSearch onSelectCustomer={setCustomer} customers={mockCustomers} />
+            <CustomerSearch onSelectCustomer={setCustomer} />
           </div>
         </div>
 
