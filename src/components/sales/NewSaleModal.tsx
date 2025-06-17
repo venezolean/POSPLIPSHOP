@@ -29,6 +29,8 @@ export const NewSaleModal: React.FC<NewSaleModalProps> = ({ isOpen, onClose }) =
   const [consumerType, setConsumerType] = useState<ConsumerType>('minorista');
   const [observations, setObservations] = useState('');
   const [taxType, setTaxType] = useState('sin_iva');
+  const [resetKey, setResetKey] = useState(0);
+
 
   const [subtotal, setSubtotal] = useState(0);
   const [discount, setDiscount] = useState(0);
@@ -85,8 +87,6 @@ const handleSaveSale = async () => {
     return;
   }
 
-  const clienteId = customer?.id || 1;
-
   const totalPagado = payments.reduce((sum, p) => sum + p.amount, 0);
   if (totalPagado < total) {
     alert('El monto pagado no cubre el total de la venta.');
@@ -95,12 +95,12 @@ const handleSaveSale = async () => {
 
 
   const ventaParams = {
-     p_cliente_id: customer ? customer.id : 1,
-  p_origen: saleOrigin,
-  p_tipo_consumidor: consumerType,
-  p_tipo_iva: taxType,
-  p_observaciones: observations,
-  p_detalles: cartItems.map((item) => ({
+    p_cliente_id: customer ? customer.id : 1,
+    p_origen: saleOrigin,
+    p_tipo_consumidor: consumerType,
+    p_tipo_iva: taxType,
+    p_observaciones: observations,
+    p_detalles: cartItems.map((item) => ({
     sku: item.sku,              // <-- asegurate que cartItems tengan sku
     cantidad: item.quantity,
     precio_unitario: item.price,
@@ -124,9 +124,6 @@ const ventaId = await registrarVenta(ventaParams);
 
 // Mostrar en consola el objeto listo para enviar
   console.log('Objeto ventaParams a enviar:', ventaParams);
-
-  // Por ahora no enviar nada
-  alert('Chequeá la consola para ver los datos de la venta.');
   
 };
 
@@ -144,6 +141,9 @@ const ventaId = await registrarVenta(ventaParams);
     setConsumerType('minorista');
     setObservations('');
     setDiscount(0);
+    setPayments([]);
+    setResetKey(prev => prev + 1); // fuerza reinicio interno
+
   };
 
   const originOptions = [
@@ -240,7 +240,9 @@ const ventaId = await registrarVenta(ventaParams);
             <PaymentMethods
               total={total}
               onPaymentChange={setPayments}
+              resetTrigger={resetKey}
             />
+
           </Card>
         </div>       
         </div>

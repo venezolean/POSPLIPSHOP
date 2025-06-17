@@ -8,9 +8,10 @@ import { formatCurrency } from '../../utils/calculations';
 interface PaymentMethodsProps {
   total: number;
   onPaymentChange: (payments: PaymentDetail[]) => void;
+  resetTrigger?: number;
 }
 
-export const PaymentMethods: React.FC<PaymentMethodsProps> = ({ total, onPaymentChange }) => {
+export const PaymentMethods: React.FC<PaymentMethodsProps> = ({ total, resetTrigger , onPaymentChange }) => {
   const [selectedMethods, setSelectedMethods] = useState<PaymentMethod[]>([]);
   const [payments, setPayments] = useState<Record<PaymentMethod, number>>({
   efectivo: 0,
@@ -30,6 +31,17 @@ const paymentLabels = {
   tarjeta: 'Tarjeta',
   transferencia: 'Transferencia',
 };
+
+useEffect(() => {
+  // Reset interno
+  setSelectedMethods([]);
+  setPayments({
+    efectivo: 0,
+    tarjeta: 0,
+    transferencia: 0,
+  });
+}, [resetTrigger]);
+
 
 
   useEffect(() => {
