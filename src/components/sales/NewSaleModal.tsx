@@ -7,11 +7,14 @@ import { CustomerSearch } from './CustomerSearch';
 import { Card } from '../ui/Card';
 import { Save, Printer, RefreshCw, ShoppingBag, Globe, Smartphone, ShoppingCart, User, Users, Package, Briefcase } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { CartItem, Customer, PaymentDetail, SaleOrigin, ConsumerType } from '../../utils/types';
+import { CartItem, Customer, SaleDraft, PaymentDetail, SaleOrigin, ConsumerType } from '../../utils/types';
 import { calculateSubtotal, calculateTax, calculateTotal, formatCurrency } from '../../utils/calculations';
 import { mockCustomers } from '../../mocks/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { registrarVenta } from '../../utils/api';
+import { saveDraft } from '../../utils/draft';
+import { v4 as uuidv4 } from 'uuid';
+
 
 
 interface NewSaleModalProps {
@@ -126,6 +129,26 @@ const ventaId = await registrarVenta(ventaParams);
   
 };
 
+const handleSaveDraft = () => {
+  if (cartItems.length === 0) {
+    alert('No podés guardar un borrador vacío.');
+    return;
+  }
+
+  const draft: SaleDraft = {
+    id: uuidv4(),
+    items: cartItems,
+    customer,
+    payments,
+    origin: saleOrigin,
+    consumer: consumerType,
+    observations,
+    taxType,
+  };
+
+  saveDraft(draft);
+  alert('Borrador guardado con éxito');
+};
 
 
   const handlePrint = () => {
@@ -289,6 +312,16 @@ const ventaId = await registrarVenta(ventaParams);
           </Card>
 
           <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              icon={<Save size={16} />}
+              onClick={handleSaveDraft}
+            >
+              Borrador
+            </Button>
+
+            
             <Button
               variant="outline"
               size="sm"

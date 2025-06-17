@@ -78,6 +78,19 @@ export const mapBusquedaAProduct = (p: ProductoBusqueda): Product => ({
   price: p.precio,
   editable: p.editable,
 });
+// guardar una venta
+
+export type SaleDraft = {
+  id: string; // puede ser UUID o un timestamp
+  items: CartItem[];
+  customer?: Customer;
+  payments: PaymentDetail[];
+  origin: SaleOrigin;
+  consumer: ConsumerType;
+  observations: string;
+  taxType: string;
+};
+
 
 // Registrar una nueva venta
 interface DetalleVenta {
@@ -128,4 +141,3 @@ export interface InventoryItemAd {
 
 
 //contar inventario
-
