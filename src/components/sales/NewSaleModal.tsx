@@ -170,8 +170,8 @@ const ventaId = await registrarVenta(ventaParams);
         {/* Header with Company and Customer Info */}
         <div className="flex justify-between items-start space-x-4">
           <div className="text-gray-700 dark:text-gray-300 text-xs">
-            <h2 className="font-bold">Mi Empresa S.A.</h2>
-            <p className="text-xs">Av. Siempreviva 742</p>
+            <h2 className="font-bold">Plipshop</h2>
+            <p className="text-xs">Av. Jujuy 50</p>
           </div>
           <div className="w-1/3">
             <CustomerSearch onSelectCustomer={setCustomer} customers={mockCustomers} />
