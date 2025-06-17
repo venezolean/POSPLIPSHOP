@@ -1,43 +1,41 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Customer } from '../../utils/types';
+import { fetchCustomerByDocument } from '../../utils/api';
 
 interface CustomerSearchProps {
   onSelectCustomer: (customer: Customer | undefined) => void;
-  customers: Customer[];
 }
 
-export const CustomerSearch: React.FC<CustomerSearchProps> = ({ onSelectCustomer, customers }) => {
+export const CustomerSearch: React.FC<CustomerSearchProps> = ({ onSelectCustomer }) => {
   const [documentNumber, setDocumentNumber] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | undefined>();
-  
-  const searchCustomer = (e: React.FormEvent) => {
+
+  const searchCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!documentNumber.trim()) return;
-    
-    const foundCustomer = customers.find(
-      (c) => c.document.replace(/[^0-9]/g, '') === documentNumber.replace(/[^0-9]/g, '')
-    );
-    
+
+    const foundCustomer = await fetchCustomerByDocument(documentNumber);
+
     if (foundCustomer) {
       setSelectedCustomer(foundCustomer);
       onSelectCustomer(foundCustomer);
     } else {
       setSelectedCustomer(undefined);
       onSelectCustomer(undefined);
-      if (confirm('Cliente no encontrado. ¿Desea agregar un nuevo cliente?')) {
+      if (confirm('Cliente no encontrado. Sali y agregalo porque el negro es flojo y le chupa un ***** la ley')) {
         // Handle new customer
       }
     }
   };
-  
+
   const clearCustomer = () => {
     setSelectedCustomer(undefined);
     onSelectCustomer(undefined);
     setDocumentNumber('');
   };
-  
+
   return (
     <div>
       {!selectedCustomer ? (

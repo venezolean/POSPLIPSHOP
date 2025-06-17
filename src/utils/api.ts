@@ -1,6 +1,6 @@
 // src/utils/api.ts
 import { supabase } from '../lib/supabase';
-import type { ProductoBusqueda, RegistrarVentaParams, InventoryItemAd } from './types';
+import type { ProductoBusqueda, RegistrarVentaParams, InventoryItemAd, Customer } from './types';
 
 export async function fetchSuggestions(term: string): Promise<ProductoBusqueda[]> {
   const { data, error } = await supabase
@@ -99,4 +99,41 @@ export async function fetchUpsertInventario(item: Partial<InventoryItemAd> & { i
 }
 
 
-//
+// buscar cliente
+
+export async function fetchCustomerByDocument(document: string): Promise<Customer | null> {
+  const { data, error } = await supabase
+    .rpc('buscar_cliente_por_documento', { p_documento: document });
+
+  if (error) {
+    console.error('Error al buscar cliente:', error.message);
+    return null;
+  }
+
+  if (!data || data.length === 0) {
+    console.log('No se encontró ningún cliente con ese documento');
+    return null;
+  }
+
+  const cliente = data[0]; // 👈 accedemos al primer resultado
+
+  console.log('Cliente encontrado:', cliente);
+
+  const tipo = cliente.tipo === 'juridico' ? 'juridico' : 'natural';
+  const nombre = cliente.nombre || '';
+  const apellido = cliente.apellido || '';
+  const razonSocial = cliente.razon_social || '';
+  const documento = cliente.dni || cliente.cuit || '';
+
+  return {
+    id: String(cliente.id),
+    type: tipo,
+    name: nombre,
+    lastName: apellido,
+    document: documento,
+    businessName: razonSocial,
+    phone: cliente.telefono || '',
+    email: cliente.email || '',
+    address: cliente.direccion || '',
+  };
+}
