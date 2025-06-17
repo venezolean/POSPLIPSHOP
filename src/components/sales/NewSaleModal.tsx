@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { ProductSearch } from './ProductSearch';
 import { ProductTable } from './ProductTable';
@@ -10,7 +10,6 @@ import { Button } from '../ui/Button';
 import { CartItem, Customer, PaymentDetail, SaleOrigin, ConsumerType } from '../../utils/types';
 import { calculateSubtotal, calculateTax, calculateTotal, formatCurrency } from '../../utils/calculations';
 import { mockCustomers } from '../../mocks/mockData';
-import type { SaleData } from '../../mocks/saleData';
 import { useAuth } from '../../context/AuthContext';
 import { registrarVenta } from '../../utils/api';
 
