@@ -97,7 +97,7 @@ const handleSaveSale = async () => {
 
 
   const ventaParams = {
-    p_cliente_id: customer ? customer.id : 1,
+    p_cliente_id: customer ? Number(customer.id) : 1,
     p_origen: saleOrigin,
     p_tipo_consumidor: consumerType,
     p_tipo_iva: taxType,
@@ -111,7 +111,7 @@ const handleSaveSale = async () => {
       metodo: p.method,
       monto: p.amount,
   })),
-  p_user_id: user?.id || '',
+  p_user_id: String(user?.id ?? ''),
 };
 
 const ventaId = await registrarVenta(ventaParams);
