@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Customer } from '../../utils/types';
@@ -6,11 +6,19 @@ import { fetchCustomerByDocument } from '../../utils/api';
 
 interface CustomerSearchProps {
   onSelectCustomer: (customer: Customer | undefined) => void;
+  resetTrigger?: number;
 }
 
-export const CustomerSearch: React.FC<CustomerSearchProps> = ({ onSelectCustomer }) => {
+export const CustomerSearch: React.FC<CustomerSearchProps> = ({ onSelectCustomer, resetTrigger }) => {
   const [documentNumber, setDocumentNumber] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | undefined>();
+
+    useEffect(() => {
+        setDocumentNumber('');
+        setSelectedCustomer(undefined);
+        onSelectCustomer(undefined);
+      }, [resetTrigger]); // 🔁 se reinicia cuando cambia
+
 
   const searchCustomer = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -9,10 +9,9 @@ import { Save, Printer, RefreshCw, ShoppingBag, Globe, Smartphone, ShoppingCart,
 import { Button } from '../ui/Button';
 import { CartItem, Customer, SaleDraft, PaymentDetail, SaleOrigin, ConsumerType } from '../../utils/types';
 import { calculateSubtotal, calculateTax, calculateTotal, formatCurrency } from '../../utils/calculations';
-import { mockCustomers } from '../../mocks/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { registrarVenta } from '../../utils/api';
-import { saveDraft } from '../../utils/draft';
+import { saveDraft, deleteDraft, getDrafts } from '../../utils/draft';
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -32,7 +31,7 @@ export const NewSaleModal: React.FC<NewSaleModalProps> = ({ isOpen, onClose }) =
   const [observations, setObservations] = useState('');
   const [taxType, setTaxType] = useState('sin_iva');
   const [resetKey, setResetKey] = useState(0);
-
+  const [drafts, setDrafts] = useState<SaleDraft[]>([]);
 
   const [subtotal, setSubtotal] = useState(0);
   const [discount, setDiscount] = useState(0);
@@ -147,8 +146,25 @@ const handleSaveDraft = () => {
   };
 
   saveDraft(draft);
+  setDrafts(getDrafts()); 
   alert('Borrador guardado con éxito');
 };
+
+useEffect(() => {
+  setDrafts(getDrafts());
+}, [isOpen]);
+
+const handleLoadDraft = (draft: SaleDraft) => {
+  setCartItems(draft.items);
+  setCustomer(draft.customer);
+  setPayments(draft.payments);
+  setSaleOrigin(draft.origin);
+  setConsumerType(draft.consumer);
+  setObservations(draft.observations);
+  setTaxType(draft.taxType);
+  setMostrar(true);
+};
+
 
 
   const handlePrint = () => {
@@ -254,6 +270,37 @@ const handleSaveDraft = () => {
               ))}
             </div>
           </Card>
+
+            {drafts.length > 0 && (
+              <Card className="p-2">
+                <h4 className="text-xs font-semibold mb-1">Borradores guardados</h4>
+                <div className="flex flex gap-2">
+                  {drafts.map(draft => (
+                    <div key={draft.id} className="flex justify-between items-center border px-2 py-1 rounded text-xs">
+                      <button
+                        onClick={() => handleLoadDraft(draft)}
+                        className="text-left flex-1 hover:underline"
+                      >
+                        {draft.customer
+                          ? `${draft.customer.name} ${draft.customer.lastName ?? ''}`
+                          : 'Sin cliente'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          deleteDraft(draft.id);
+                          setDrafts(getDrafts()); // actualiza la lista
+                        }}
+                        className="text-red-500 hover:text-red-700 text-sm ml-2"
+                        title="Eliminar borrador"
+                      >
+                        🗑
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+
           </>
           )}   
           
