@@ -3,6 +3,7 @@ import { Sun, Moon, LogOut, Settings, User, ChevronDown } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '../ui/Button';
+import { Link } from 'react-router-dom';
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -19,9 +20,11 @@ export const PageLayout: React.FC<PageLayoutProps> = ({ children, title }) => {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-white dark:bg-gray-800 shadow-sm">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-primary-600 dark:text-primary-300">
-            POS System
-          </h1>
+          
+            <Link to="/" className="text-xl font-bold text-primary-600 dark:text-primary-300">
+              POS System
+            </Link>
+
           
           <div className="flex items-center space-x-2">
             <Button 
@@ -105,13 +108,17 @@ export const PageLayout: React.FC<PageLayoutProps> = ({ children, title }) => {
       </main>
       
       {/* Footer */}
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto">
-        <div className="container mx-auto px-4 py-4">
-          <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-            © {new Date().getFullYear()} POS System. Todos los derechos reservados.
+      <footer className="fixed bottom-0 left-0 w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50">
+        <div className="container mx-auto px-4 py-3">
+          <p
+            className="text-sm text-gray-500 dark:text-gray-400 text-center cursor-pointer font-semibold"
+            onClick={() => window.location.href = '/'}
+          >
+            © {new Date().getFullYear()} POS System
           </p>
         </div>
       </footer>
+
     </div>
   );
 };
