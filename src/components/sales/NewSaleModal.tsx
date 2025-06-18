@@ -32,6 +32,8 @@ export const NewSaleModal: React.FC<NewSaleModalProps> = ({ isOpen, onClose }) =
   const [taxType, setTaxType] = useState('sin_iva');
   const [resetKey, setResetKey] = useState(0);
   const [drafts, setDrafts] = useState<SaleDraft[]>([]);
+  const [estadoVenta, setEstadoVenta] = useState('entregado'); // o 'pagado' si querés mantener el valor por defecto
+
 
   const [subtotal, setSubtotal] = useState(0);
   const [discount, setDiscount] = useState(0);
@@ -88,8 +90,9 @@ const handleSaveSale = async () => {
     return;
   }
 
+  // Solo validar pagos si es una venta normal (entregado)
   const totalPagado = payments.reduce((sum, p) => sum + p.amount, 0);
-  if (totalPagado < total) {
+  if (estadoVenta === 'entregado' && totalPagado < total) {
     alert('El monto pagado no cubre el total de la venta.');
     return;
   }
@@ -100,7 +103,7 @@ const handleSaveSale = async () => {
     p_origen: saleOrigin,
     p_tipo_consumidor: consumerType,
     p_tipo_iva: taxType,
-    p_observaciones: observations,
+    p_observaciones: estadoVenta,
     p_detalles: cartItems.map((item) => ({
     sku: item.sku,              // <-- asegurate que cartItems tengan sku
     cantidad: item.quantity,
@@ -392,6 +395,30 @@ const handleLoadDraft = (draft: SaleDraft) => {
             >
               Guardar (Enter)
             </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setEstadoVenta('presupuesto');
+                setPayments([]); // forzamos sin pago
+                handleSaveSale();
+              }}
+            >
+              Presupuesto
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setEstadoVenta('consigna');
+                setPayments([]); // forzamos sin pago
+                handleSaveSale();
+              }}
+            >
+              Consigna
+            </Button>
+
           </div>
         </div>
       </div>
