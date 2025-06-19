@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ShoppingBag, Users, History, Package, Eye } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { NewSaleModal } from '../components/sales/NewSaleModal';
-import { CustomersModal } from '../components/sales/CustomersModal';
+import { CustomersModal } from '../components/customers/CustomersModal';
 import { SalesHistoryModal } from '../components/sales/SalesHistoryModal';
 import { NewProductModal } from '../components/products/ProductsModal';
 import { useNavigate } from 'react-router-dom';

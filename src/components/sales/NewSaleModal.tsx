@@ -3,7 +3,7 @@ import { Modal } from '../ui/Modal';
 import { ProductSearch } from './ProductSearch';
 import { ProductTable } from './ProductTable';
 import { PaymentMethods } from './PaymentMethods';
-import { CustomerSearch } from './CustomerSearch';
+import { CustomerSearch } from '../customers/CustomerSearch';
 import { Card } from '../ui/Card';
 import { Save, Printer, RefreshCw, ShoppingBag, Globe, Smartphone, ShoppingCart, User, Users, Package, Briefcase } from 'lucide-react';
 import { Button } from '../ui/Button';

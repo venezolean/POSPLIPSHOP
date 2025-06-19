@@ -137,3 +137,37 @@ export async function fetchCustomerByDocument(document: string): Promise<Custome
     address: cliente.direccion || '',
   };
 }
+
+
+export async function registrarCliente(params: {
+  tipo: 'natural' | 'juridico';
+  email: string;
+  nombre?: string | null;
+  apellido?: string | null;
+  razon_social?: string | null;
+  dni?: string | null;
+  cuit?: string | null;
+  telefono?: string | null;
+  direccion?: string | null;
+  created_by: string;
+}): Promise<number | null> {
+  const { data, error } = await supabase.rpc('insertar_cliente', {
+    p_tipo: params.tipo,
+    p_email: params.email,
+    p_nombre: params.nombre,
+    p_apellido: params.apellido,
+    p_razon_social: params.razon_social,
+    p_dni: params.dni,
+    p_cuit: params.cuit,
+    p_telefono: params.telefono,
+    p_direccion: params.direccion,
+    p_created_by: params.created_by,
+  });
+
+  if (error) {
+    console.error('Error al registrar cliente:', error.message);
+    return null;
+  }
+
+  return data; // devuelve el id del cliente
+}

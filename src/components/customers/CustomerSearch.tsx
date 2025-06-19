@@ -4,6 +4,7 @@ import { Input } from '../ui/Input';
 import { Customer } from '../../utils/types';
 import { fetchCustomerByDocument } from '../../utils/api';
 
+
 interface CustomerSearchProps {
   onSelectCustomer: (customer: Customer | undefined) => void;
   resetTrigger?: number;
