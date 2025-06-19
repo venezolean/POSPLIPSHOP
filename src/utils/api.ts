@@ -1,6 +1,6 @@
 // src/utils/api.ts
 import { supabase } from '../lib/supabase';
-import type { ProductoBusqueda, RegistrarVentaParams, InventoryItemAd, Customer } from './types';
+import type {ProductoRegistro, ProductoBusqueda, RegistrarVentaParams, InventoryItemAd, Customer } from './types';
 
 export async function fetchSuggestions(term: string): Promise<ProductoBusqueda[]> {
   const { data, error } = await supabase
@@ -170,4 +170,18 @@ export async function registrarCliente(params: {
   }
 
   return data; // devuelve el id del cliente
+}
+
+
+//registrar producto
+
+export async function registrarProducto(params: ProductoRegistro): Promise<number | null> {
+  const { data, error } = await supabase.rpc('registrar_producto', params);
+
+  if (error) {
+    console.error('Error al registrar producto:', error.message);
+    return null;
+  }
+
+  return data; // Devuelve el ID del producto registrado
 }

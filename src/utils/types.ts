@@ -140,4 +140,28 @@ export interface InventoryItemAd {
 }
 
 
-//contar inventario
+//registrar productos
+
+
+export interface ProductoRegistro {
+  p_nombre_principal: string;
+  p_proveedor_id: number | null;
+  p_caracteristicas: Record<string, string[]>; // corresponde a JSONB
+  p_nombre_proveedor: string;
+  p_nombre_ml: string;
+  p_nombre_exportador: string;
+  p_garantia: boolean;
+  p_unidades_por_paquete: number;
+  p_paquetes_por_caja: number;
+  p_cajas_por_pallet: number;
+  p_foto_url: string;
+  p_rubro: string;
+  p_categoria: string;
+  p_subcategoria: string;
+  p_perecedero: boolean;
+  p_tiempo_vencimiento: number;
+  p_temporada_venta: string;
+  p_codigo_barras: string;
+  p_user_id: string; // UUID
+}
+
