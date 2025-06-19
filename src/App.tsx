@@ -4,7 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { LoginPage } from './pages/LoginPage';
 import { SalesRegistrationPage } from './pages/SalesRegistrationPage';
-import { InventoryPage } from './Inventory/InventoryPage';
+import { InventoryPage } from './components/Inventory/InventoryPage';
 import { useAuth } from './context/AuthContext';
 
 // Protected route component

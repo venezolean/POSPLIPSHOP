@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Modal } from '../components/ui/Modal';
-import { Input } from '../components/ui/Input';
-import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
-import { formatCurrency } from '../utils/calculations';
-import { InventoryItemAd } from '../utils/types';
+import { Modal } from '../ui/Modal';
+import { Input } from '../ui/Input';
+import { Button } from '../ui/Button';
+import { Badge } from '../ui/Badge';
+import { formatCurrency } from '../../utils/calculations';
+import { InventoryItemAd } from '../../utils/types';
 
 
 interface EditInventoryModalProps {

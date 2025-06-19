@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Edit, Trash2, Plus, Package, Eye } from 'lucide-react';
-import { PageLayout } from '../components/layout/PageLayout';
-import { Input } from '../components/ui/Input';
-import { Button } from '../components/ui/Button';
-import { Table, TableHead, TableBody, TableRow, TableCell } from '../components/ui/Table';
-import { Badge } from '../components/ui/Badge';
-import { Card } from '../components/ui/Card';
-import { Select } from '../components/ui/Select';
+import { PageLayout } from '../layout/PageLayout';
+import { Input } from '../ui/Input';
+import { Button } from '../ui/Button';
+import { Table, TableHead, TableBody, TableRow, TableCell } from '../ui/Table';
+import { Badge } from '../ui/Badge';
+import { Card } from '../ui/Card';
+import { Select } from '../ui/Select';
 import { EditInventoryModal } from './EditInventoryModal';
-import { fetchInventarioAvanzado, fetchOpcionesFiltros, fetchUpsertInventario } from '../utils/api';
-import { InventoryItemAd } from '../utils/types';
+import { fetchInventarioAvanzado, fetchOpcionesFiltros, fetchUpsertInventario } from '../../utils/api';
+import { InventoryItemAd } from '../../utils/types';
 
 
 export const InventoryPage: React.FC = () => {
