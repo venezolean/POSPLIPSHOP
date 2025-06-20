@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
-import { Select } from '../ui/Select';
 import { Card } from '../ui/Card';
 import { Plus } from 'lucide-react';
 import { VariantsModal } from './VariantsModal';
@@ -138,7 +137,7 @@ const resetForm = () => {
         onClose={handleClose}
         title="Nuevo Producto"
         footer={footer}
-        size="lg"
+        size="xl"
       >
         <form id="product-form" onSubmit={handleSubmit} className="space-y-4">
           <Input label="Nombre del producto" value={p_nombre_principal} onChange={(e) => setNombrePrincipal(e.target.value)} required fullWidth />
@@ -170,12 +169,18 @@ const resetForm = () => {
               <h3 className="text-lg font-semibold">Variantes técnicas</h3>
               <Button onClick={() => setIsVariantsModalOpen(true)} icon={<Plus size={16} />}>Agregar variantes</Button>
             </div>
-            {Object.keys(variants).length > 0 ? (
-              <pre className="bg-gray-50 dark:bg-gray-800 p-4 rounded overflow-auto">
-                {JSON.stringify(variants, null, 2)}
-              </pre>
-            ) : (
-              <p className="text-gray-500 text-center py-4">No hay variantes agregadas</p>
+            {Object.entries(variants).flatMap(([key, values]) =>
+              values.map((raw, i) => {
+                const { nombre } = JSON.parse(raw);
+                return (
+                  <span
+                    key={`${key}-${i}`}
+                    className="inline-block bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100 text-sm px-3 py-1 rounded-full"
+                  >
+                    {nombre}
+                  </span>
+                );
+              })
             )}
           </Card>
         </form>

@@ -20,6 +20,7 @@ export const VariantsModal: React.FC<VariantsModalProps> = ({ isOpen, onClose, o
   const [tempPrecio, setTempPrecio] = useState<string>('');
   const [tempCodigoBarras, setTempCodigoBarras] = useState<string>('');
   const [tempLink, setTempLink] = useState<string>('');
+  const [showPreview, setShowPreview] = useState(false)
 
   const handleAddVariant = (variant: VariantOption) => {
     if (selectedVariants[variant.key]) return;
@@ -59,67 +60,38 @@ export const VariantsModal: React.FC<VariantsModalProps> = ({ isOpen, onClose, o
     }));
   };
 
-  const renderVariantInput = (variant: VariantOption) => {
-    return (
-      <div className="space-y-2">
-        <div className="grid grid 1 md:grid 2 lg:grid 4 gap-2">
-          <Input
-            value={tempNombre}
-            onChange={(e) => setTempNombre(e.target.value)}
-            placeholder="Nombre"
-          />
-          <Input
-            value={tempPrecio}
-            type="number"
-            onChange={(e) => setTempPrecio(e.target.value)}
-            placeholder="Precio"
-          />
-          <Input
-            value={tempCodigoBarras}
-            onChange={(e) => setTempCodigoBarras(e.target.value)}
-            placeholder="Código de barras"
-          />
-          <Input
-            value={tempLink}
-            onChange={(e) => setTempLink(e.target.value)}
-            placeholder="Link"
-          />
-        </div>
-        <Button
-          onClick={() => handleAddValue(variant.key)}
-          icon={<Plus size={16} />}
-        >
-          Agregar variante
-        </Button>
-        {selectedVariants[variant.key]?.map((value, index) => (
-          <div key={index} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-2 rounded">
-            <span>{value}</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleRemoveValue(variant.key, index)}
-              icon={<X size={16} />}
-            />
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   const handleSave = () => {
     onSave(selectedVariants);
+    // clear state after save if needed
+    setSelectedVariants({});
+    setTempNombre('');
+    setTempPrecio('');
+    setTempCodigoBarras('');
+    setTempLink('');
+    setCurrentVariant('');
+    onClose();
+  };
+
+  const handleCancel = () => {
+    // reset only within this modal
+    setSelectedVariants({});
+    setTempNombre('');
+    setTempPrecio('');
+    setTempCodigoBarras('');
+    setTempLink('');
+    setCurrentVariant('');
     onClose();
   };
 
   const footer = (
     <div className="flex justify-end space-x-2">
-      <Button variant="outline" onClick={onClose}>Cancelar</Button>
+      <Button variant="outline" onClick={handleCancel}>Cancelar</Button>
       <Button onClick={handleSave}>Guardar variantes</Button>
     </div>
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Variantes técnicas" footer={footer} size="lg">
+    <Modal isOpen={isOpen} onClose={handleCancel} title="Variantes técnicas" footer={footer} size="lg">
       <div className="space-y-4">
         <div className="flex space-x-2">
           <Select
@@ -130,7 +102,9 @@ export const VariantsModal: React.FC<VariantsModalProps> = ({ isOpen, onClose, o
             }}
             options={[
               { value: '', label: 'Seleccionar variante...' },
-              ...variantOptions.filter(v => !selectedVariants[v.key]).map(v => ({ value: v.key, label: v.label }))
+              ...variantOptions
+                .filter(v => !selectedVariants[v.key])
+                .map(v => ({ value: v.key, label: v.label }))
             ]}
           />
         </div>
@@ -151,20 +125,66 @@ export const VariantsModal: React.FC<VariantsModalProps> = ({ isOpen, onClose, o
                     icon={<X size={16} />}
                   />
                 </div>
-                {renderVariantInput(variant)}
+                {/* Input para agregar valores */}
+                <div className="space-y-2">
+                  <div className="grid grid 2 md:grid 2 lg:grid 4 gap-2">
+                    <Input
+                      value={tempNombre}
+                      onChange={e => setTempNombre(e.target.value)}
+                      placeholder="Caracteristica"
+                    />
+                    <Input
+                      value={tempPrecio}
+                      type="number"
+                      onChange={e => setTempPrecio(e.target.value)}
+                      placeholder="Precio"
+                    />
+                    <Input
+                      value={tempCodigoBarras}
+                      onChange={e => setTempCodigoBarras(e.target.value)}
+                      placeholder="Código de barras"
+                    />
+                    <Input
+                      value={tempLink}
+                      onChange={e => setTempLink(e.target.value)}
+                      placeholder="Link"
+                    />
+                    
+                  </div>
+                  <Button onClick={() => handleAddValue(key)} icon={<Plus size={16} />}>
+                    Agregar variante
+                  </Button>
+                  {selectedVariants[key]?.map((value, index) => (
+                    <div key={index} className="flex text-xs items-center justify-between bg-gray-50 dark:bg-gray-800 p-2 rounded w-full h-full">
+                      <span className="truncate">{value}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveValue(key, index)}
+                        icon={<X size={16} />}
+                      />
+                    </div>
+                  ))}
+                </div>
               </Card>
             );
           })}
         </div>
 
-        {Object.keys(selectedVariants).length > 0 && (
-          <Card className="p-4">
-            <h3 className="text-lg font-semibold mb-2">Preview</h3>
-            <pre className="bg-gray-50 dark:bg-gray-800 p-4 rounded overflow-auto">
-              {JSON.stringify(selectedVariants, null, 2)}
-            </pre>
-          </Card>
-        )}
+        <div>
+      <Button onClick={() => setShowPreview((v) => !v)}>
+        {showPreview ? 'Ocultar preview' : 'Mostrar preview'}
+      </Button>
+
+      {showPreview && Object.keys(selectedVariants).length > 0 && (
+        <Card className="p-4 mt-2">
+          <h3 className="text-lg font-semibold mb-2">Preview</h3>
+          <pre className="bg-gray-50 dark:bg-gray-800 p-4 rounded overflow-auto">
+            {JSON.stringify(selectedVariants, null, 2)}
+          </pre>
+        </Card>
+      )}
+    </div>
       </div>
     </Modal>
   );
