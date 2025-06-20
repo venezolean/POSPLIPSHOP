@@ -396,7 +396,7 @@ const handleLoadDraft = (draft: SaleDraft) => {
               Guardar (Enter)
             </Button>
             <Button
-              variant="outline"
+              variant="danger"
               size="sm"
               onClick={() => {
                 setEstadoVenta('presupuesto');
@@ -408,7 +408,7 @@ const handleLoadDraft = (draft: SaleDraft) => {
             </Button>
 
             <Button
-              variant="outline"
+              variant="warning"
               size="sm"
               onClick={() => {
                 setEstadoVenta('consigna');
