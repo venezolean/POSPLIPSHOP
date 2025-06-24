@@ -437,7 +437,9 @@ const handlePrint = useReactToPrint({
                         {customer?.phone ?? '—'}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right text-white">
+                      
+                      
                       <p>
                         <strong>Condición de IVA:</strong>{' '}
                         {taxType === 'sin_iva'
@@ -446,6 +448,9 @@ const handlePrint = useReactToPrint({
                           ? 'IVA 21%'
                           : 'IVA 10.5%'}
                       </p>
+                    
+                    
+                    
                     </div>
                   </section>
 
@@ -521,8 +526,8 @@ const handlePrint = useReactToPrint({
                     <ul className="list-disc list-inside space-y-1">
                       <li>🟢 Todos los productos son de alta calidad garantizada.</li>
                       <li>
-                        💡 Los precios son{' '}
-                        {taxType === 'sin_iva' ? 'netos, sin IVA' : 'con IVA incluido'}.
+                        {' '}
+                        {taxType === 'sin_iva' ? '' : ' 💡 Los precios son con IVA incluido'}.
                       </li>
                       <li>
                         🎁 Descuentos disponibles por compras mayores o clientes frecuentes.

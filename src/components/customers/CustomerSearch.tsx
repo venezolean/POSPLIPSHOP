@@ -3,7 +3,7 @@ import { Search } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Customer } from '../../utils/types';
 import { fetchCustomerByDocument } from '../../utils/api';
-
+import { AddCustomerModal } from './AddCustomerModal';
 
 interface CustomerSearchProps {
   onSelectCustomer: (customer: Customer | undefined) => void;
@@ -13,13 +13,13 @@ interface CustomerSearchProps {
 export const CustomerSearch: React.FC<CustomerSearchProps> = ({ onSelectCustomer, resetTrigger }) => {
   const [documentNumber, setDocumentNumber] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | undefined>();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-    useEffect(() => {
-        setDocumentNumber('');
-        setSelectedCustomer(undefined);
-        onSelectCustomer(undefined);
-      }, [resetTrigger]); // 🔁 se reinicia cuando cambia
-
+  useEffect(() => {
+    setDocumentNumber('');
+    setSelectedCustomer(undefined);
+    onSelectCustomer(undefined);
+  }, [resetTrigger]); // reinicia al cambiar resetTrigger
 
   const searchCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,9 +33,7 @@ export const CustomerSearch: React.FC<CustomerSearchProps> = ({ onSelectCustomer
     } else {
       setSelectedCustomer(undefined);
       onSelectCustomer(undefined);
-      if (confirm('Cliente no encontrado. Sali y agregalo porque el negro es flojo y le chupa un ***** la ley')) {
-        // Handle new customer
-      }
+      setIsAddModalOpen(true);
     }
   };
 
@@ -43,6 +41,12 @@ export const CustomerSearch: React.FC<CustomerSearchProps> = ({ onSelectCustomer
     setSelectedCustomer(undefined);
     onSelectCustomer(undefined);
     setDocumentNumber('');
+  };
+
+  const handleAddCustomer = (newCustomer: Customer) => {
+    setSelectedCustomer(newCustomer);
+    onSelectCustomer(newCustomer);
+    setIsAddModalOpen(false);
   };
 
   return (
@@ -62,7 +66,7 @@ export const CustomerSearch: React.FC<CustomerSearchProps> = ({ onSelectCustomer
         <div className="bg-gray-50 dark:bg-gray-800 p-1 rounded text-xs flex justify-between items-center">
           <div className="flex flex-col">
             <span className="font-medium">
-              {selectedCustomer.type === 'natural' 
+              {selectedCustomer.type === 'natural'
                 ? `${selectedCustomer.name} ${selectedCustomer.lastName}`
                 : selectedCustomer.businessName}
             </span>
@@ -71,7 +75,7 @@ export const CustomerSearch: React.FC<CustomerSearchProps> = ({ onSelectCustomer
               {selectedCustomer.document}
             </span>
           </div>
-          <button 
+          <button
             onClick={clearCustomer}
             className="text-gray-500 hover:text-gray-700 text-xs ml-2"
           >
@@ -79,6 +83,13 @@ export const CustomerSearch: React.FC<CustomerSearchProps> = ({ onSelectCustomer
           </button>
         </div>
       )}
+
+      <AddCustomerModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAddCustomer={handleAddCustomer}
+        initialDocument={documentNumber}
+      />
     </div>
   );
 };

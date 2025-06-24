@@ -31,7 +31,7 @@ export const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
-  const [saveToDatabase, setSaveToDatabase] = useState(true);
+
   const { user } = useAuth();
 
   const resetForm = () => {
@@ -43,7 +43,6 @@ export const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
     setPhone('');
     setEmail('');
     setAddress('');
-    setSaveToDatabase(true);
   };
   
   const handleClose = () => {
@@ -68,7 +67,7 @@ const normalizarTexto = (text?: string) => text?.trim().toLowerCase() || null;
   let clienteId: number | null = null;
 console.log('🚀 Enviando formulario');
 
-if (saveToDatabase && user?.id) {
+if (user?.id) {
   console.log('💾 Registrando en la base de datos...');
   clienteId = await registrarCliente({
     tipo: customerType,
@@ -156,10 +155,9 @@ if (saveToDatabase && user?.id) {
               fullWidth
             />
             <Input
-              label="DNI"
+              label="DNI (opcional)"
               value={document}
               onChange={(e) => setDocument(e.target.value)}
-              required
               fullWidth
             />
           </>
@@ -183,9 +181,10 @@ if (saveToDatabase && user?.id) {
         )}
         
         <Input
-          label="Teléfono (opcional)"
+          label="Teléfono"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
+          required
           fullWidth
         />
         
@@ -204,21 +203,6 @@ if (saveToDatabase && user?.id) {
           fullWidth
         />
         
-        <div className="flex items-center">
-          <input
-            id="save-database"
-            type="checkbox"
-            checked={saveToDatabase}
-            onChange={(e) => setSaveToDatabase(e.target.checked)}
-            className="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
-          />
-          <label
-            htmlFor="save-database"
-            className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Guardar cliente en base de datos
-          </label>
-        </div>
       </form>
     </Modal>
   );
