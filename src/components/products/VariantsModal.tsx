@@ -20,7 +20,10 @@ export const VariantsModal: React.FC<VariantsModalProps> = ({ isOpen, onClose, o
   const [tempPrecio, setTempPrecio] = useState<string>('');
   const [tempCodigoBarras, setTempCodigoBarras] = useState<string>('');
   const [tempLink, setTempLink] = useState<string>('');
-  const [showPreview, setShowPreview] = useState(false)
+  const [tempUnidadesPorPaquete, setTempUnidadesPorPaquete] = useState<string>('');
+  const [tempPaquetesPorCaja, setTempPaquetesPorCaja] = useState<string>('');
+  const [tempStockv, setTempStockv] = useState<string>('');
+  const [showPreview, setShowPreview] = useState(false);
 
   const handleAddVariant = (variant: VariantOption) => {
     if (selectedVariants[variant.key]) return;
@@ -39,7 +42,10 @@ export const VariantsModal: React.FC<VariantsModalProps> = ({ isOpen, onClose, o
       nombre: tempNombre,
       precio: tempPrecio,
       codigo_barras: tempCodigoBarras,
-      link: tempLink
+      link: tempLink,
+      unidades_por_paquete: tempUnidadesPorPaquete,
+      paquetes_por_caja: tempPaquetesPorCaja,
+      stockv: tempStockv,
     };
     const valueString = JSON.stringify(fullValue);
     setSelectedVariants(prev => ({
@@ -47,10 +53,14 @@ export const VariantsModal: React.FC<VariantsModalProps> = ({ isOpen, onClose, o
       [key]: [...(prev[key] || []), valueString]
     }));
 
+    // limpiar campos temporales
     setTempNombre('');
     setTempPrecio('');
     setTempCodigoBarras('');
     setTempLink('');
+    setTempUnidadesPorPaquete('');
+    setTempPaquetesPorCaja('');
+    setTempStockv('');
   };
 
   const handleRemoveValue = (key: string, index: number) => {
@@ -62,23 +72,27 @@ export const VariantsModal: React.FC<VariantsModalProps> = ({ isOpen, onClose, o
 
   const handleSave = () => {
     onSave(selectedVariants);
-    // clear state after save if needed
     setSelectedVariants({});
     setTempNombre('');
     setTempPrecio('');
     setTempCodigoBarras('');
     setTempLink('');
+    setTempUnidadesPorPaquete('');
+    setTempPaquetesPorCaja('');
+    setTempStockv('');
     setCurrentVariant('');
     onClose();
   };
 
   const handleCancel = () => {
-    // reset only within this modal
     setSelectedVariants({});
     setTempNombre('');
     setTempPrecio('');
     setTempCodigoBarras('');
     setTempLink('');
+    setTempUnidadesPorPaquete('');
+    setTempPaquetesPorCaja('');
+    setTempStockv('');
     setCurrentVariant('');
     onClose();
   };
@@ -125,13 +139,12 @@ export const VariantsModal: React.FC<VariantsModalProps> = ({ isOpen, onClose, o
                     icon={<X size={16} />}
                   />
                 </div>
-                {/* Input para agregar valores */}
                 <div className="space-y-2">
-                  <div className="grid grid 2 md:grid 2 lg:grid 4 gap-2">
+                  <div className="grid grid 2 md:grid 4 lg:grid 7 gap-2">
                     <Input
                       value={tempNombre}
                       onChange={e => setTempNombre(e.target.value)}
-                      placeholder="Caracteristica"
+                      placeholder="Característica"
                     />
                     <Input
                       value={tempPrecio}
@@ -149,7 +162,27 @@ export const VariantsModal: React.FC<VariantsModalProps> = ({ isOpen, onClose, o
                       onChange={e => setTempLink(e.target.value)}
                       placeholder="Link"
                     />
-                    
+                    <Input
+                      value={tempUnidadesPorPaquete}
+                      type="number"
+                      onChange={e => setTempUnidadesPorPaquete(e.target.value)}
+                      placeholder="Unidades por paquete"
+                      required
+                    />
+                    <Input
+                      value={tempPaquetesPorCaja}
+                      type="number"
+                      onChange={e => setTempPaquetesPorCaja(e.target.value)}
+                      placeholder="Paquetes por caja"
+                      required
+                    />
+                    <Input
+                      value={tempStockv}
+                      type="number"
+                      onChange={e => setTempStockv(e.target.value)}
+                      placeholder="Stock"
+                      required
+                    />
                   </div>
                   <Button onClick={() => handleAddValue(key)} icon={<Plus size={16} />}>
                     Agregar variante
@@ -172,19 +205,19 @@ export const VariantsModal: React.FC<VariantsModalProps> = ({ isOpen, onClose, o
         </div>
 
         <div>
-      <Button onClick={() => setShowPreview((v) => !v)}>
-        {showPreview ? 'Ocultar preview' : 'Mostrar preview'}
-      </Button>
+          <Button onClick={() => setShowPreview(v => !v)}>
+            {showPreview ? 'Ocultar preview' : 'Mostrar preview'}
+          </Button>
 
-      {showPreview && Object.keys(selectedVariants).length > 0 && (
-        <Card className="p-4 mt-2">
-          <h3 className="text-lg font-semibold mb-2">Preview</h3>
-          <pre className="bg-gray-50 dark:bg-gray-800 p-4 rounded overflow-auto">
-            {JSON.stringify(selectedVariants, null, 2)}
-          </pre>
-        </Card>
-      )}
-    </div>
+          {showPreview && Object.keys(selectedVariants).length > 0 && (
+            <Card className="p-4 mt-2">
+              <h3 className="text-lg font-semibold mb-2">Preview</h3>
+              <pre className="bg-gray-50 dark:bg-gray-800 p-4 rounded overflow-auto">
+                {JSON.stringify(selectedVariants, null, 2)}
+              </pre>
+            </Card>
+          )}
+        </div>
       </div>
     </Modal>
   );

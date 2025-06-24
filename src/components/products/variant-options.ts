@@ -19,5 +19,6 @@ export const variantOptions: VariantOption[] = [
   { key: 'presentación', label: 'Presentación', type: 'text' },
   { key: 'resistencia', label: 'Resistencia', type: 'number' },
   { key: 'capacidad', label: 'Capacidad', type: 'number-with-unit' },
-  { key: 'uso_aplicacion', label: 'Uso / Aplicación', type: 'text' }
+  { key: 'uso_aplicacion', label: 'Uso / Aplicación', type: 'text' },
+  { key: 'gramaje', label: 'Gramaje', type: 'text' }
 ];

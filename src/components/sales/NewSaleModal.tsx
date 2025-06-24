@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Modal } from '../ui/Modal';
 import { ProductSearch } from './ProductSearch';
 import { ProductTable } from './ProductTable';
@@ -13,6 +13,8 @@ import { useAuth } from '../../context/AuthContext';
 import { registrarVenta } from '../../utils/api';
 import { saveDraft, deleteDraft, getDrafts } from '../../utils/draft';
 import { v4 as uuidv4 } from 'uuid';
+import { useReactToPrint } from 'react-to-print'
+import logo from './img/Plip.png';
 
 
 
@@ -40,6 +42,7 @@ export const NewSaleModal: React.FC<NewSaleModalProps> = ({ isOpen, onClose }) =
   const [tax, setTax] = useState(0);
   const [total, setTotal] = useState(0);
   const [mostrar, setMostrar] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const newSubtotal = calculateSubtotal(cartItems);
@@ -85,7 +88,7 @@ export const NewSaleModal: React.FC<NewSaleModalProps> = ({ isOpen, onClose }) =
   };
 
 const handleSaveSale = async () => {
-  if (cartItems.length === 0) {
+    if (!Array.isArray(cartItems) || cartItems.length === 0) {
     alert('Debés agregar al menos un producto.');
     return;
   }
@@ -170,9 +173,12 @@ const handleLoadDraft = (draft: SaleDraft) => {
 
 
 
-  const handlePrint = () => {
-    alert('Imprimiendo comprobante...');
-  };
+const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: 'Presupuesto PlipShop',
+    
+  })
+
 
   const handleReset = () => {
     setCartItems([]);
@@ -216,7 +222,8 @@ const handleLoadDraft = (draft: SaleDraft) => {
             <p className="text-xs">Av. Jujuy 50</p>
           </div>
           <div className="w-1/3">
-            <CustomerSearch onSelectCustomer={setCustomer} />
+            <CustomerSearch onSelectCustomer={setCustomer} resetTrigger={resetKey}  // <— aquí
+ />
           </div>
         </div>
 
@@ -388,6 +395,143 @@ const handleLoadDraft = (draft: SaleDraft) => {
             >
               Imprimir
             </Button>
+              
+              <div style={{ display: 'none' }}>
+                <div ref={printRef} className="bg-white p-6">
+                  <header className="grid grid-cols-3 items-start border-b pb-2">
+                    <div>
+                      <img src={logo} alt="Logo PlipShop" className="h-10 object-contain" />
+                    </div>
+                    <div className="text-center">
+                      <h2 className="text-lg font-bold">PRESUPUESTO</h2>
+                    </div>
+                    <div className="text-right text-xs">
+                      <p>
+                        Nº{' '}
+                        <strong>
+                          {String(Math.floor(Math.random() * 10000)).padStart(4, '0')}
+                        </strong>
+                      </p>
+                      <p>
+                        Fecha:{' '}
+                        <strong>{new Date().toLocaleDateString('es-AR')}</strong>
+                      </p>
+                    </div>
+                    <div className="col-span-3 mt-2 text-xs text-gray-700">
+                      <p><strong>Dirección:</strong> Av. Jujuy 50, C.A.B.A.</p>
+                      <p><strong>Teléfono:</strong> 1127240042</p>
+                      <p><strong>Correo:</strong> ventas.plipshop@gmail.com</p>
+                      <p><strong>Web:</strong> www.plipshop.com.ar</p>
+                    </div>
+                  </header>
+
+                  <section className="grid grid-cols-2 gap-4 mt-3 p-2 border rounded text-xs">
+                    <div>
+                      <p>
+                        <strong>Cliente:</strong>{' '}
+                        {customer ? `${customer.name} ${customer.lastName ?? ''}` : '—'}
+                      </p>
+                      <p><strong>Atendido por:</strong> {user?.nombre ?? '—'}</p>
+                      <p>
+                        <strong>Teléfono:</strong>{' '}
+                        {customer?.phone ?? '—'}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p>
+                        <strong>Condición de IVA:</strong>{' '}
+                        {taxType === 'sin_iva'
+                          ? 'Sin IVA'
+                          : taxType === '21'
+                          ? 'IVA 21%'
+                          : 'IVA 10.5%'}
+                      </p>
+                    </div>
+                  </section>
+
+                  <table className="w-full mt-3 border-collapse text-xs">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="px-1 py-1 text-left">Item</th>
+                        <th className="px-1 py-1 text-left">Código</th>
+                        <th className="px-1 py-1 text-left">Artículo</th>
+                        <th className="px-1 py-1 text-right">Cant.</th>
+                        <th className="px-1 py-1 text-right">Precio</th>
+                        <th className="px-1 py-1 text-right">Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cartItems.map((p, i) => (
+                        <tr
+                          key={p.id}
+                          className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                        >
+                          <td className="px-1 py-1">
+                            {String(i + 1).padStart(4, '0')}
+                          </td>
+                          <td className="px-1 py-1">
+                            {p.id.toString().padStart(5, '0')}
+                          </td>
+                          <td className="px-1 py-1">{p.name}</td>
+                          <td className="px-1 py-1 text-right">{p.quantity}</td>
+                          <td className="px-1 py-1 text-right">
+                            {formatCurrency(p.price)}
+                          </td>
+                          <td className="px-1 py-1 text-right">
+                            {formatCurrency(p.quantity * p.price)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
+                    <div className="col-span-2" />
+                    <div className="p-2 border rounded bg-gray-50 space-y-1">
+                      <p>
+                        Subtotal:{' '}
+                        <strong>{formatCurrency(subtotal)}</strong>
+                      </p>
+                      <p>
+                        IVA 10.5%:{' '}
+                        <strong>
+                          {taxType === '10.5'
+                            ? formatCurrency(subtotal * 0.105)
+                            : formatCurrency(0)}
+                        </strong>
+                      </p>
+                      <p>
+                        IVA 21%:{' '}
+                        <strong>
+                          {taxType === '21'
+                            ? formatCurrency(subtotal * 0.21)
+                            : formatCurrency(0)}
+                        </strong>
+                      </p>
+                      <p className="text-sm mt-1">
+                        TOTAL:{' '}
+                        <strong className="text-blue-600">
+                          {formatCurrency(total)}
+                        </strong>
+                      </p>
+                    </div>
+                  </div>
+
+                  <footer className="mt-4 border-t pt-2 text-xs text-gray-600">
+                    <ul className="list-disc list-inside space-y-1">
+                      <li>🟢 Todos los productos son de alta calidad garantizada.</li>
+                      <li>
+                        💡 Los precios son{' '}
+                        {taxType === 'sin_iva' ? 'netos, sin IVA' : 'con IVA incluido'}.
+                      </li>
+                      <li>
+                        🎁 Descuentos disponibles por compras mayores o clientes frecuentes.
+                      </li>
+                    </ul>
+                  </footer>
+                </div>
+              </div>
+            
             <Button
               size="sm"
               icon={<Save size={16} />}

@@ -87,6 +87,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     // podés resetear los campos si querés
   } else {
     console.error('No se pudo registrar el producto.');
+    alert ('No se pudo registrar el producto todos los campos deben estar llenos.')
   }
 };
 
@@ -149,16 +150,10 @@ const resetForm = () => {
             <Input label="Nombre exportador" value={p_nombre_exportador} onChange={(e) => setNombreExportador(e.target.value)} required fullWidth />
             <Input label="Código de barras" value={p_codigo_barras} onChange={(e) => setCodigoBarras(e.target.value)} fullWidth />
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            <Input label="Unidades por paquete" type="number" value={p_unidades_por_paquete} onChange={(e) => setUnidadesPorPaquete(parseInt(e.target.value))} fullWidth />
-            <Input label="Paquetes por caja" type="number" value={p_paquetes_por_caja} onChange={(e) => setPaquetesPorCaja(parseInt(e.target.value))} fullWidth />
-            <Input label="Cajas por pallet" type="number" value={p_cajas_por_pallet} onChange={(e) => setCajasPorPallet(parseInt(e.target.value))} fullWidth />
-          </div>
-          <Input label="Foto URL" value={p_foto_url} onChange={(e) => setFotoUrl(e.target.value)} fullWidth />
+
           <div className="grid grid-cols-3 gap-4">
             <Input label="Rubro" value={p_rubro} onChange={(e) => setRubro(e.target.value)} fullWidth />
             <Input label="Categoría" value={p_categoria} onChange={(e) => setCategoria(e.target.value)} fullWidth />
-            <Input label="Subcategoría" value={p_subcategoria} onChange={(e) => setSubcategoria(e.target.value)} fullWidth />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Input label="Tiempo de vencimiento (días)" type="number" value={p_tiempo_vencimiento} onChange={(e) => setTiempoVencimiento(parseInt(e.target.value))} fullWidth />
