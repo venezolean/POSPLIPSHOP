@@ -193,6 +193,7 @@ if (user?.id) {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
           fullWidth
         />
         
