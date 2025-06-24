@@ -46,13 +46,17 @@ export const NewSaleModal: React.FC<NewSaleModalProps> = ({ isOpen, onClose }) =
 
   useEffect(() => {
     const newSubtotal = calculateSubtotal(cartItems);
-    const newTax = calculateTax(newSubtotal);
+    let rate = 0;
+    if (taxType === '10.5') rate = 0.105;
+    else if (taxType === '21')  rate = 0.21;
+
+    const newTax   = calculateTax(newSubtotal, rate);
     const newTotal = calculateTotal(newSubtotal, discount, newTax);
     
     setSubtotal(newSubtotal);
     setTax(newTax);
     setTotal(newTotal);
-  }, [cartItems, discount]);
+  }, [cartItems, discount, taxType]);
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
@@ -100,12 +104,23 @@ const handleSaveSale = async () => {
     return;
   }
 
+  let dbTaxType: 'con_iva' | 'medio_iva' | 'sin_iva';
+
+    if (taxType === 'sin_iva') {
+      dbTaxType = 'sin_iva';
+    } else if (taxType === '10.5') {
+      dbTaxType = 'medio_iva';
+    } else {
+      // taxType === '21'
+      dbTaxType = 'con_iva';
+    }
+
 
   const ventaParams = {
     p_cliente_id: customer ? Number(customer.id) : 1,
     p_origen: saleOrigin,
     p_tipo_consumidor: consumerType,
-    p_tipo_iva: taxType,
+    p_tipo_iva: dbTaxType,
     p_observaciones: estadoVenta,
     p_detalles: cartItems.map((item) => ({
     sku: item.sku,              // <-- asegurate que cartItems tengan sku
@@ -168,7 +183,8 @@ const handleLoadDraft = (draft: SaleDraft) => {
   setConsumerType(draft.consumer);
   setObservations(draft.observations);
   setTaxType(draft.taxType);
-  setMostrar(true);
+  setMostrar(false);
+  setEstadoVenta('entregado')
 };
 
 
@@ -190,7 +206,7 @@ const handlePrint = useReactToPrint({
     setDiscount(0);
     setPayments([]);
     setResetKey(prev => prev + 1); // fuerza reinicio interno
-
+    setEstadoVenta('entregado')
   };
 
   const originOptions = [
@@ -229,7 +245,28 @@ const handlePrint = useReactToPrint({
 
         {/* Sale Options and Payment Methods */}
         <div className="flex gap-2">
-          
+        <Button
+  type="button"
+  onClick={() => {
+    const types = ['sin_iva', '10.5', '21'];
+    const next = types[(types.indexOf(taxType) + 1) % types.length];
+    setTaxType(next);
+  }}
+  className={`px-4 py-2 rounded ${
+    taxType === 'sin_iva'
+      ? 'bg-black text-white'
+      : taxType === '10.5'
+      ? 'bg-gray-500 text-white'
+      : 'bg-white text-black border border-gray-500'
+  }`}
+>
+  {taxType === 'sin_iva'
+    ? '🫵'
+    : taxType === '10.5'
+    ? '🕵️'
+    : '👌'}
+</Button>
+  
         <Button
           onClick={() => setMostrar(!mostrar)}
           className="bg-blue-500 text-white px-4 py-2 rounded"
@@ -240,7 +277,7 @@ const handlePrint = useReactToPrint({
           
           <>
           {/* Sale Origin */}
-          <Card className="h 1/2"> <p className="text-xs"> Procedencia</p>
+          <Card className="h 1/2"> <h4 className="text-xs font-semibold mb-1">Procedencia</h4>
             <div className="flex gap-1 justify-center">
               {originOptions.map((option) => (
                 <div key={option.value} className="relative group">
@@ -261,7 +298,7 @@ const handlePrint = useReactToPrint({
           </Card>
 
           {/* Consumer Type */}
-          <Card className="h 1/2"> <p className="text-xs">Tipo de consumidor </p>
+          <Card className="h 1/2"> <h4 className="text-xs font-semibold mb-1">Tipo de consumidor</h4>
             <div className="flex gap-1 justify-center">
               {consumerOptions.map((option) => (
                 <div key={option.value} className="relative group">
@@ -292,7 +329,7 @@ const handlePrint = useReactToPrint({
                         className="text-left flex-1 hover:underline"
                       >
                         {draft.customer
-                          ? `${draft.customer.name} ${draft.customer.lastName ?? ''}`
+                          ? `${draft.customer.name}`
                           : 'Sin cliente'}
                       </button>
                       <button
@@ -351,22 +388,33 @@ const handlePrint = useReactToPrint({
 
         {/* Summary and Actions */}
         <div className="grid grid-cols-2 gap-4">
-          <Card className="p-2">
-            <div className="space-y-1 text-sm">
-              <div className="flex justify-between">
-                <span>Subtotal:</span>
-                <span>{formatCurrency(subtotal)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>IVA (21%):</span>
-                <span>{formatCurrency(tax)}</span>
-              </div>
-              <div className="flex justify-between font-bold">
-                <span>Total:</span>
-                <span className="text-primary-600">{formatCurrency(total)}</span>
-              </div>
-            </div>
-          </Card>
+  <Card className="p-2">
+    <div className="space-y-1 text-sm">
+      {/* Subtotal */}
+      <div className="flex justify-between">
+        <span>Subtotal:</span>
+        <span>{formatCurrency(subtotal)}</span>
+      </div>
+
+      {/* IVA dinámico */}
+      {taxType !== 'sin_iva' && (
+        <div className="flex justify-between">
+          <span>
+            {taxType === '10.5'
+              ? 'IVA (10.5%):'
+              : 'IVA (21%):'}
+          </span>
+          <span>{formatCurrency(tax)}</span>
+        </div>
+      )}
+
+      {/* Total */}
+      <div className="flex justify-between font-bold">
+        <span>Total:</span>
+        <span className="text-primary-600">{formatCurrency(total)}</span>
+      </div>
+    </div>
+  </Card>
 
           <div className="flex justify-end gap-2">
             <Button
@@ -490,37 +538,39 @@ const handlePrint = useReactToPrint({
                     </tbody>
                   </table>
 
-                  <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
-                    <div className="col-span-2" />
-                    <div className="p-2 border rounded bg-gray-50 space-y-1">
-                      <p>
-                        Subtotal:{' '}
-                        <strong>{formatCurrency(subtotal)}</strong>
-                      </p>
-                      <p>
-                        IVA 10.5%:{' '}
-                        <strong>
-                          {taxType === '10.5'
-                            ? formatCurrency(subtotal * 0.105)
-                            : formatCurrency(0)}
-                        </strong>
-                      </p>
-                      <p>
-                        IVA 21%:{' '}
-                        <strong>
-                          {taxType === '21'
-                            ? formatCurrency(subtotal * 0.21)
-                            : formatCurrency(0)}
-                        </strong>
-                      </p>
-                      <p className="text-sm mt-1">
-                        TOTAL:{' '}
-                        <strong className="text-blue-600">
-                          {formatCurrency(total)}
-                        </strong>
-                      </p>
-                    </div>
-                  </div>
+<div className="mt-4 grid grid-cols-3 gap-2 text-xs">
+  <div className="col-span-2" />
+  <div className="p-2 border rounded bg-gray-50 space-y-1">
+    {/* Subtotal */}
+    <p>
+      Subtotal:{' '}
+      <strong>{formatCurrency(subtotal)}</strong>
+    </p>
+
+    {/* IVA dinámico */}
+    {taxType === '10.5' && (
+      <p>
+        IVA 10.5%:{' '}
+        <strong>{formatCurrency(subtotal * 0.105)}</strong>
+      </p>
+    )}
+    {taxType === '21' && (
+      <p>
+        IVA 21%:{' '}
+        <strong>{formatCurrency(subtotal * 0.21)}</strong>
+      </p>
+    )}
+
+    {/* Total */}
+    <p className="text-sm mt-1">
+      TOTAL:{' '}
+      <strong className="text-blue-600">
+        {formatCurrency(total)}
+      </strong>
+    </p>
+  </div>
+</div>
+
 
                   <footer className="mt-4 border-t pt-2 text-xs text-gray-600">
                     <ul className="list-disc list-inside space-y-1">

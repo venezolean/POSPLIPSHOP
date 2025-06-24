@@ -56,7 +56,7 @@ export const CustomerSearch: React.FC<CustomerSearchProps> = ({ onSelectCustomer
           <Input
             value={documentNumber}
             onChange={(e) => setDocumentNumber(e.target.value)}
-            placeholder="DNI/CUIT"
+            placeholder="DNI/CUIT/Telefono"
             icon={<Search size={14} />}
             className="text-xs py-1"
             fullWidth
