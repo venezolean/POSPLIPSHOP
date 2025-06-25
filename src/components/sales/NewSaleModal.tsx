@@ -448,16 +448,17 @@ const handlePrint = useReactToPrint({
                 <div ref={printRef} className="bg-white p-6">
                   <header className="grid grid-cols-3 items-start border-b pb-2">
                     <div>
-                      <img src={logo} alt="Logo PlipShop" className="h-10 object-contain" />
+                      <img src={logo} alt="Logo PlipShop" className="h-500 object-contain" />
                     </div>
                     <div className="text-center">
-                      <h2 className="text-lg font-bold">PRESUPUESTO</h2>
+                      <h1 className="text-s font-bold">PRESUPUESTO</h1>
+                      <p className="text-xs">(No valido como factura)</p>
                     </div>
                     <div className="text-right text-xs">
                       <p>
                         Nº{' '}
                         <strong>
-                          {String(Math.floor(Math.random() * 10000)).padStart(4, '0')}
+                          {String(Math.floor(Math.random() * 1000000)).padStart(4, '0')}
                         </strong>
                       </p>
                       <p>
@@ -467,7 +468,7 @@ const handlePrint = useReactToPrint({
                     </div>
                     <div className="col-span-3 mt-2 text-xs text-gray-700">
                       <p><strong>Dirección:</strong> Av. Jujuy 50, C.A.B.A.</p>
-                      <p><strong>Teléfono:</strong> 1127240042</p>
+                      <p><strong>Teléfono:</strong> 1128783367</p>
                       <p><strong>Correo:</strong> ventas.plipshop@gmail.com</p>
                       <p><strong>Web:</strong> www.plipshop.com.ar</p>
                     </div>
@@ -479,22 +480,17 @@ const handlePrint = useReactToPrint({
                         <strong>Cliente:</strong>{' '}
                         {customer ? `${customer.name} ${customer.lastName ?? ''}` : '—'}
                       </p>
-                      <p><strong>Atendido por:</strong> {user?.nombre ?? '—'}</p>
+                      <p><strong>Direccion:</strong> {customer?.address ?? '—'}</p>
                       <p>
                         <strong>Teléfono:</strong>{' '}
                         {customer?.phone ?? '—'}
                       </p>
                     </div>
-                    <div className="text-right text-white">
+                    <div className="text-right ">
                       
                       
                       <p>
-                        <strong>Condición de IVA:</strong>{' '}
-                        {taxType === 'sin_iva'
-                          ? 'Sin IVA'
-                          : taxType === '21'
-                          ? 'IVA 21%'
-                          : 'IVA 10.5%'}
+                        <strong>Atendido por:</strong> {user?.nombre ?? '—'}{' '}
                       </p>
                     
                     
@@ -574,11 +570,11 @@ const handlePrint = useReactToPrint({
 
                   <footer className="mt-4 border-t pt-2 text-xs text-gray-600">
                     <ul className="list-disc list-inside space-y-1">
-                      <li>🟢 Todos los productos son de alta calidad garantizada.</li>
-                      <li>
-                        {' '}
-                        {taxType === 'sin_iva' ? '' : ' 💡 Los precios son con IVA incluido'}.
-                      </li>
+                      <li>🟢 Presupuesto valido por 24 horas.</li>
+                      
+                        
+                        {taxType === 'sin_iva' ? <li>📲Compras Mayoristas al 11 6917-4577</li> : <li> 💡 Los precios son con IVA incluido.</li>}
+                      
                       <li>
                         🎁 Descuentos disponibles por compras mayores o clientes frecuentes.
                       </li>
