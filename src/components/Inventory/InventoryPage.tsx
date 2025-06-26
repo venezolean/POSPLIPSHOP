@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, Edit, Trash2, Plus, Package, Eye } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, Filter, Edit, Trash2, Plus, Package, Eye, Printer  } from 'lucide-react';
 import { PageLayout } from '../layout/PageLayout';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
@@ -10,6 +10,7 @@ import { Select } from '../ui/Select';
 import { EditInventoryModal } from './EditInventoryModal';
 import { fetchInventarioAvanzado, fetchOpcionesFiltros, fetchUpsertInventario } from '../../utils/api';
 import { InventoryItemAd } from '../../utils/types';
+import { useReactToPrint } from 'react-to-print';
 
 
 export const InventoryPage: React.FC = () => {
@@ -133,9 +134,24 @@ const handleInlineChange = (id: number, field: keyof InventoryItemAd, value: any
     },
   }));
 };
+
+const printRef = useRef<HTMLDivElement>(null);
+ const handlePrint = useReactToPrint({
+     contentRef: printRef,
+   documentTitle: 'Inventario PlipShop',
+ });
+
    
   return (
     <PageLayout title="Inventario">
+     <div className="flex justify-end mb-4">
+       <Button
+         icon={<Printer size={18} />}
+         onClick={handlePrint}
+       >
+         Imprimir
+       </Button>
+     </div>
       <div className="space-y-6">
         {/* Filters and Search */}
         <Card className="p-4">
@@ -178,9 +194,9 @@ const handleInlineChange = (id: number, field: keyof InventoryItemAd, value: any
 <div className="mt-4 flex flex-wrap gap-4 items-start">
   {(
   [
-    ['Rubro', opcionesFiltro.rubros, rubro, setRubro],
+    // ['Rubro', opcionesFiltro.rubros, rubro, setRubro],
     ['Categoría', opcionesFiltro.categorias, categoria, setCategoria],
-    ['Subcategoría', opcionesFiltro.subcategorias, subcategoria, setSubcategoria],
+    // ['Subcategoría', opcionesFiltro.subcategorias, subcategoria, setSubcategoria],
     ['Temporada', opcionesFiltro.temporadas, temporada, setTemporada]
   ] as [string, string[], string | null, React.Dispatch<React.SetStateAction<string | null>>][]
 ).map(([label, lista, valor, setter]) => (
@@ -263,7 +279,8 @@ const handleInlineChange = (id: number, field: keyof InventoryItemAd, value: any
             </div>
           </Card>
         </div>
-
+     {/* Contenedor printable */}
+     <div ref={printRef}>
         {/* Inventory Table */}
         <Card>
           <Table striped hoverable>
@@ -429,7 +446,7 @@ const handleInlineChange = (id: number, field: keyof InventoryItemAd, value: any
           )}
         </Card>
       </div>
-
+</div>
       {/* Edit Modal */}
       <EditInventoryModal
         isOpen={isEditModalOpen}

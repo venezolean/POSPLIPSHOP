@@ -74,6 +74,10 @@ export const CustomerSearch: React.FC<CustomerSearchProps> = ({ onSelectCustomer
               {selectedCustomer.type === 'natural' ? 'DNI: ' : 'CUIT: '}
               {selectedCustomer.document}
             </span>
+            <span className="text-gray-500 text-[10px]">
+              Direccion: 
+              {selectedCustomer.address}
+            </span>
           </div>
           <button
             onClick={clearCustomer}

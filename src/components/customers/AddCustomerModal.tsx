@@ -58,8 +58,6 @@ const normalizarTexto = (text?: string) => text?.trim().toLowerCase() || null;
 
   const docLimpio = normalizarDocumento(document);
   const nuevoEmail = normalizarTexto(email);
-  const nuevoNombre = normalizarTexto(name);
-  const nuevoApellido = normalizarTexto(lastName);
   const nuevaRazonSocial = normalizarTexto(businessName);
   const nuevoTelefono = phone?.trim() || null;
   const nuevaDireccion = address?.trim() || null;
@@ -72,8 +70,8 @@ if (user?.id) {
   clienteId = await registrarCliente({
     tipo: customerType,
     email: nuevoEmail!,
-    nombre: nuevoNombre,
-    apellido: nuevoApellido,
+    nombre: name,
+    apellido: lastName,
     razon_social: nuevaRazonSocial,
     dni: customerType === 'natural' ? docLimpio : null,
     cuit: customerType === 'juridico' ? docLimpio : null,
