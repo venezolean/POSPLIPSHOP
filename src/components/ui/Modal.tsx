@@ -25,8 +25,8 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   footer,
   size = 'md',
-  closeOnOutsideClick = true,
-  closeOnEsc = true,
+  closeOnOutsideClick = false,
+  closeOnEsc = false,
   showCloseButton = true,
   className,
 }) => {
