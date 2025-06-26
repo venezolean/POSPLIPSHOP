@@ -146,14 +146,7 @@ const printRef = useRef<HTMLDivElement>(null);
    
   return (
     <PageLayout title="Inventario">
-     <div className="flex justify-end mb-4">
-       <Button
-         icon={<Printer size={18} />}
-         onClick={handlePrint}
-       >
-         Imprimir
-       </Button>
-     </div>
+
       <div className="space-y-6">
         {/* Filters and Search */}
         <Card className="p-4">
@@ -185,10 +178,10 @@ const printRef = useRef<HTMLDivElement>(null);
               />
             </div>
             <Button
-              icon={<Plus size={18} />}
-              onClick={() => alert('Agregar nuevo producto')}
+              icon={<Printer size={18} />}
+              onClick={handlePrint}
             >
-              Nuevo Producto
+              Imprimir
             </Button>
           </div>
         </Card>
