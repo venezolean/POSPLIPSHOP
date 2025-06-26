@@ -279,8 +279,7 @@ const printRef = useRef<HTMLDivElement>(null);
             </div>
           </Card>
         </div>
-     {/* Contenedor printable */}
-     <div ref={printRef}>
+     
         {/* Inventory Table */}
         <Card>
           <Table striped hoverable>
@@ -446,7 +445,43 @@ const printRef = useRef<HTMLDivElement>(null);
           )}
         </Card>
       </div>
+
+{/* Contenedor printable */}
+     <div style={{ display: 'none' }}>
+     <div ref={printRef} >
+
+        <table className="w-full border-collapse">
+    <thead>
+      <tr className="bg-gray-100">
+        <th className="border px-2 py-1 text-left">Nombre</th>
+        <th className="border px-2 py-1 text-center">Stock</th>
+        <th className="border px-2 py-1 text-right">Precio</th>
+        <th className="border px-2 py-1 text-left">Link</th>
+      </tr>
+    </thead>
+    <tbody>
+      {inventory.map(item => (
+        <tr key={item.id}>
+          <td className="border px-2 py-1">{item.nombre}</td>
+          <td className="border px-2 py-1 text-center">{item.stock}</td>
+          <td className="border px-2 py-1 text-right">{item.precio}</td>
+          <td className="border px-2 py-1">
+            {item.link ? (
+              <a href={item.link} target="_blank" rel="noopener noreferrer">
+                {item.link}
+              </a>
+            ) : (
+              '—'
+            )}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
 </div>
+</div>
+
+
       {/* Edit Modal */}
       <EditInventoryModal
         isOpen={isEditModalOpen}
