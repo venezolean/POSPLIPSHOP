@@ -38,7 +38,9 @@ const [opcionesFiltro, setOpcionesFiltro] = useState<{
   temporadas: []
 });
 
-
+useEffect(() => {
+  setCurrentPage(1);
+}, [searchTerm, stockFilter, categoria, subcategoria, rubro, temporada]);
 
 // Carga de inventario filtrado
 useEffect(() => {
@@ -160,7 +162,10 @@ const printRef = useRef<HTMLDivElement>(null);
               <Input
                 placeholder="Buscar por SKU, nombre o código de barras..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
                 icon={<Search size={18} />}
                 fullWidth
               />
@@ -357,24 +362,25 @@ const printRef = useRef<HTMLDivElement>(null);
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono text-sm">{item.link}<input
-    type="text"
-    defaultValue={item.link ?? ''}
-    className="w-40 text-right border rounded px-1 py-0.5"
-    onChange={(e) =>
-      handleInlineChange(item.id, 'link', e.target.value)
-    }
-    onKeyDown={(e) => {
-      if (e.key === 'Enter') {
-        const itemToUpdate = editingItem[item.id];
-        if (itemToUpdate) fetchUpsertInventario({ id: item.id, ...itemToUpdate });
-      }
-    }}
-    onBlur={() => {
-      const itemToUpdate = editingItem[item.id];
-      if (itemToUpdate) fetchUpsertInventario({ id: item.id, ...itemToUpdate });
-    }}
-  />
+                    <TableCell className="font-mono text-sm">
+                      <input
+                        type="text"
+                        defaultValue={item.link ?? ''}
+                        className="w-20 text-right border rounded px-1 py-0.5"
+                        onChange={(e) =>
+                          handleInlineChange(item.id, 'link', e.target.value)
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            const itemToUpdate = editingItem[item.id];
+                            if (itemToUpdate) fetchUpsertInventario({ id: item.id, ...itemToUpdate });
+                          }
+                        }}
+                        onBlur={() => {
+                          const itemToUpdate = editingItem[item.id];
+                          if (itemToUpdate) fetchUpsertInventario({ id: item.id, ...itemToUpdate });
+                        }}
+                      />
                     </TableCell>
                     
                     <TableCell align="center">
