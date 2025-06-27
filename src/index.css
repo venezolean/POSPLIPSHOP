@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  /* oculta en pantalla, muestra sólo en print */
+  .print-container {
+    @apply hidden print:block absolute top-0 left-0 w-full;
+  }
+  /* muestra en pantalla, oculta en print */
+  .no-print {
+    @apply print:hidden;
+  }
+}

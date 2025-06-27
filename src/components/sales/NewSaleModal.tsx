@@ -15,7 +15,7 @@ import { saveDraft, deleteDraft, getDrafts } from '../../utils/draft';
 import { v4 as uuidv4 } from 'uuid';
 import { useReactToPrint } from 'react-to-print'
 import logo from './img/Plip.png';
-
+import '../../index.css'
 
 
 interface NewSaleModalProps {
@@ -192,7 +192,14 @@ const handleLoadDraft = (draft: SaleDraft) => {
 const handlePrint = useReactToPrint({
     contentRef: printRef,
     documentTitle: 'Presupuesto PlipShop',
-    
+      pageStyle: `
+    @page { margin: 20mm; }
+    @media print {
+      body * { visibility: hidden !important; }
+      .print-container, .print-container * { visibility: visible !important; }
+      .print-container { position: absolute; top: 0; left: 0; width: 100%; }
+    }
+  `,
   })
 
 
@@ -229,6 +236,7 @@ const handlePrint = useReactToPrint({
       onClose={onClose}
       title="Nueva Venta"
       size="full"
+      className="no-print"
     >
       <div className="h-full flex flex-col space-y-2">
         {/* Header with Company and Customer Info */}
@@ -280,7 +288,7 @@ const handlePrint = useReactToPrint({
           <Card className="h 1/2"> <h4 className="text-xs font-semibold mb-1">Procedencia</h4>
             <div className="flex gap-1 justify-center">
               {originOptions.map((option) => (
-                <div key={option.value} className="relative group">
+                <div key={option.value} className="relative group overflow-visible">
                   <Button
                     variant={saleOrigin === option.value ? 'primary' : 'outline'}
                     size="sm"
@@ -289,7 +297,7 @@ const handlePrint = useReactToPrint({
                   >
                     {option.icon}
                   </Button>
-                  <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-1.5 py-0.5 rounded invisible group-hover:visible  transition-opacity whitespace-nowrap">
                     {option.label}
                   </span>
                 </div>
@@ -301,7 +309,7 @@ const handlePrint = useReactToPrint({
           <Card className="h 1/2"> <h4 className="text-xs font-semibold mb-1">Tipo de consumidor</h4>
             <div className="flex gap-1 justify-center">
               {consumerOptions.map((option) => (
-                <div key={option.value} className="relative group">
+                <div key={option.value} className="relative group overflow-visible">
                   <Button
                     variant={consumerType === option.value ? 'primary' : 'outline'}
                     size="sm"
@@ -310,7 +318,7 @@ const handlePrint = useReactToPrint({
                   >
                     {option.icon}
                   </Button>
-                  <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-1.5 py-0.5 rounded invisible group-hover:visible  transition-opacity whitespace-nowrap">
                     {option.label}
                   </span>
                 </div>
@@ -388,64 +396,105 @@ const handlePrint = useReactToPrint({
 
         {/* Summary and Actions */}
         <div className="grid grid-cols-2 gap-4">
-  <Card className="p-2">
-    <div className="space-y-1 text-sm">
-      {/* Subtotal */}
-      <div className="flex justify-between">
-        <span>Subtotal:</span>
-        <span>{formatCurrency(subtotal)}</span>
-      </div>
+          <Card className="p-2">
+            <div className="space-y-1 text-sm">
+              {/* Subtotal */}
+              <div className="flex justify-between">
+                <span>Subtotal:</span>
+                <span>{formatCurrency(subtotal)}</span>
+              </div>
 
-      {/* IVA dinámico */}
-      {taxType !== 'sin_iva' && (
-        <div className="flex justify-between">
-          <span>
-            {taxType === '10.5'
-              ? 'IVA (10.5%):'
-              : 'IVA (21%):'}
-          </span>
-          <span>{formatCurrency(tax)}</span>
-        </div>
-      )}
+              {/* IVA dinámico */}
+              {taxType !== 'sin_iva' && (
+                <div className="flex justify-between">
+                  <span>
+                    {taxType === '10.5'
+                      ? 'IVA (10.5%):'
+                      : 'IVA (21%):'}
+                  </span>
+                  <span>{formatCurrency(tax)}</span>
+                </div>
+              )}
 
-      {/* Total */}
-      <div className="flex justify-between font-bold">
-        <span>Total:</span>
-        <span className="text-primary-600">{formatCurrency(total)}</span>
-      </div>
-    </div>
-  </Card>
+              {/* Total */}
+              <div className="flex justify-between font-bold">
+                <span>Total:</span>
+                <span className="text-primary-600">{formatCurrency(total)}</span>
+              </div>
+            </div>
+          </Card>
+          <Card overflow-x-auto>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                icon={<Save size={16} />}
+                onClick={handleSaveDraft}
+                className="gap-0 sm:gap-2"
+              >
+                <span className="hidden sm:inline">Borrador</span>
+              </Button>
 
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              icon={<Save size={16} />}
-              onClick={handleSaveDraft}
-            >
-              Borrador
-            </Button>
-
-            
-            <Button
-              variant="outline"
-              size="sm"
-              icon={<RefreshCw size={16} />}
-              onClick={handleReset}
-            >
-              Nueva (N)
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              icon={<Printer size={16} />}
-              onClick={handlePrint}
-            >
-              Imprimir
-            </Button>
               
-              <div style={{ display: 'none' }}>
-                <div ref={printRef} className="bg-white p-6">
+              <Button
+                variant="outline"
+                size="sm"
+                icon={<RefreshCw size={16} />}
+                onClick={handleReset}className="gap-0 sm:gap-2"
+              >
+                <span className="hidden sm:inline">Nueva (N)</span>
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                icon={<Printer size={16} />}
+                onClick={handlePrint}
+                className="gap-0 sm:gap-2"
+              >
+                <span className="hidden sm:inline">Imprimir</span>
+              </Button>
+                                    
+              <Button
+                size="sm"
+                icon={<Save size={16} />}
+                onClick={handleSaveSale}
+                className="gap-0 sm:gap-2"
+              >
+                <span className="hidden sm:inline">Guardar (Enter)</span>
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => {
+                  setEstadoVenta('presupuesto');
+                  setPayments([]); // forzamos sin pago
+                  handleSaveSale();
+                }}
+                className="gap-0 sm:gap-2"
+              >
+                <span className="hidden sm:inline">Presupuesto</span>
+              </Button>
+
+              <Button
+                variant="warning"
+                size="sm"
+                onClick={() => {
+                  setEstadoVenta('consigna');
+                  setPayments([]); // forzamos sin pago
+                  handleSaveSale();
+                }}
+                className="gap-0 sm:gap-2"
+              >
+                <span className="hidden sm:inline">Consigna</span>
+              </Button>
+
+            </div>
+          </Card>
+          
+        </div>
+      </div>
+              <div>
+                <div ref={printRef} className="print-container bg-white p-6">
                   <header className="grid grid-cols-3 items-start border-b pb-2">
                     <div>
                       <img src={logo} alt="Logo PlipShop" className="h-500 object-contain" />
@@ -534,38 +583,38 @@ const handlePrint = useReactToPrint({
                     </tbody>
                   </table>
 
-<div className="mt-4 grid grid-cols-3 gap-2 text-xs">
-  <div className="col-span-2" />
-  <div className="p-2 border rounded bg-gray-50 space-y-1">
-    {/* Subtotal */}
-    <p>
-      Subtotal:{' '}
-      <strong>{formatCurrency(subtotal)}</strong>
-    </p>
+                    <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
+                      <div className="col-span-2" />
+                      <div className="p-2 border rounded bg-gray-50 space-y-1">
+                        {/* Subtotal */}
+                        <p>
+                          Subtotal:{' '}
+                          <strong>{formatCurrency(subtotal)}</strong>
+                        </p>
 
-    {/* IVA dinámico */}
-    {taxType === '10.5' && (
-      <p>
-        IVA 10.5%:{' '}
-        <strong>{formatCurrency(subtotal * 0.105)}</strong>
-      </p>
-    )}
-    {taxType === '21' && (
-      <p>
-        IVA 21%:{' '}
-        <strong>{formatCurrency(subtotal * 0.21)}</strong>
-      </p>
-    )}
+                        {/* IVA dinámico */}
+                        {taxType === '10.5' && (
+                          <p>
+                            IVA 10.5%:{' '}
+                            <strong>{formatCurrency(subtotal * 0.105)}</strong>
+                          </p>
+                        )}
+                        {taxType === '21' && (
+                          <p>
+                            IVA 21%:{' '}
+                            <strong>{formatCurrency(subtotal * 0.21)}</strong>
+                          </p>
+                        )}
 
-    {/* Total */}
-    <p className="text-sm mt-1">
-      TOTAL:{' '}
-      <strong className="text-blue-600">
-        {formatCurrency(total)}
-      </strong>
-    </p>
-  </div>
-</div>
+                        {/* Total */}
+                        <p className="text-sm mt-1">
+                          TOTAL:{' '}
+                          <strong className="text-blue-600">
+                            {formatCurrency(total)}
+                          </strong>
+                        </p>
+                      </div>
+                    </div>
 
 
                   <footer className="mt-4 border-t pt-2 text-xs text-gray-600">
@@ -582,41 +631,7 @@ const handlePrint = useReactToPrint({
                   </footer>
                 </div>
               </div>
-            
-            <Button
-              size="sm"
-              icon={<Save size={16} />}
-              onClick={handleSaveSale}
-            >
-              Guardar (Enter)
-            </Button>
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={() => {
-                setEstadoVenta('presupuesto');
-                setPayments([]); // forzamos sin pago
-                handleSaveSale();
-              }}
-            >
-              Presupuesto
-            </Button>
-
-            <Button
-              variant="warning"
-              size="sm"
-              onClick={() => {
-                setEstadoVenta('consigna');
-                setPayments([]); // forzamos sin pago
-                handleSaveSale();
-              }}
-            >
-              Consigna
-            </Button>
-
-          </div>
-        </div>
-      </div>
     </Modal>
+    
   );
 };
