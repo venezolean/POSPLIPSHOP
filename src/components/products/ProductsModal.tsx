@@ -138,7 +138,7 @@ const resetForm = () => {
         onClose={handleClose}
         title="Nuevo Producto"
         footer={footer}
-        size="full"
+        size="lg"
       >
         <form id="product-form" onSubmit={handleSubmit} className="space-y-4">
           <Input label="Nombre del producto" value={p_nombre_principal} onChange={(e) => setNombrePrincipal(e.target.value)} required fullWidth />
