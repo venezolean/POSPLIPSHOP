@@ -28,20 +28,6 @@ export type SaleOrigin = 'Puerta' | 'Web' | 'Redes' | 'Mercado_libre';
 
 export type ConsumerType = 'minorista' | 'mayorista' | 'consumidor_final' | 'monotributo';
 
-export interface Sale {
-  id: string;
-  items: CartItem[];
-  customer?: Customer;
-  payments: PaymentDetail[];
-  subtotal: number;
-  discount: number;
-  tax: number;
-  total: number;
-  origin: SaleOrigin;
-  consumerType: ConsumerType;
-  createdAt: Date;
-}
-
 
 // src/utils/types.ts
 export interface ProductoBusqueda {
@@ -165,3 +151,29 @@ export interface ProductoRegistro {
   p_user_id: string; // UUID
 }
 
+
+// para buscar presupuesto
+export interface VentaRPC {
+  id: number;
+  cliente_id: number;
+  cliente_nombre: string;
+  cliente_apellido: string;
+  origen: SaleOrigin;
+  tipo_consumidor: ConsumerType;
+  estado: string;
+  total: number;
+  observaciones: string;
+  created_at: string;
+  tipo_iva: string;
+  detalles: {
+    sku: string;
+    nombre: string;
+    codigo_barras: string;
+    cantidad: number;
+    precio_unitario: number;
+  }[];
+  pagos?: {
+    metodo: PaymentMethod;
+    monto: number;
+  }[];
+}

@@ -1,6 +1,6 @@
 // src/utils/api.ts
 import { supabase } from '../lib/supabase';
-import type {ProductoRegistro, ProductoBusqueda, RegistrarVentaParams, InventoryItemAd, Customer } from './types';
+import type {ProductoRegistro, ProductoBusqueda, RegistrarVentaParams, InventoryItemAd, Customer, VentaRPC, PaymentDetail } from './types';
 
 export async function fetchSuggestions(term: string): Promise<ProductoBusqueda[]> {
   const { data, error } = await supabase
@@ -184,4 +184,51 @@ export async function registrarProducto(params: ProductoRegistro): Promise<numbe
   }
 
   return data; // Devuelve el ID del producto registrado
+}
+
+
+// buscador de presupuestos api/ventas.ts (usando fetch)
+
+export async function buscarPresupuestos(term: string): Promise<VentaRPC[]> {
+  const termino = term.trim()
+
+  // Llamás al RPC sin genéricos
+  const { data, error } = await supabase
+    .rpc('buscar_ventas_presupuesto', { termino })
+
+  if (error) {
+    console.error('[buscarPresupuestos] RPC error:', error)
+    throw new Error(error.message)
+  }
+
+  // Data viene como any[] | null, se la casteamos
+  return (data as VentaRPC[]) ?? []
+}
+
+
+export async function actualizarPresupuestoVenta(
+  presupuestoId: number,
+  pagos: PaymentDetail[],
+): Promise<void> {
+  // 1) Actualizar el estado de la venta (presupuesto → entregado o pagado)
+  const { error: errV } = await supabase
+    .from('ventas')
+    .update({ estado: 'presupuesto pagado' })        // o 'pagado', según tu lógica
+    .eq('id', presupuestoId);
+
+  if (errV) throw errV;
+
+  // 2) Insertar los pagos asociados
+  const pagosInsert = pagos.map(p => ({
+    venta_id: presupuestoId,
+    metodo: p.method,
+    monto: p.amount,
+    created_at: new Date().toISOString(),
+  }));
+
+  const { error: errP } = await supabase
+    .from('pagos')
+    .insert(pagosInsert);
+
+  if (errP) throw errP;
 }

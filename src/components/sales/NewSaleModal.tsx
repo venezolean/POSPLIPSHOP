@@ -7,15 +7,17 @@ import { CustomerSearch } from '../customers/CustomerSearch';
 import { Card } from '../ui/Card';
 import { Save, Printer, RefreshCw, ShoppingBag, Globe, Smartphone, ShoppingCart, User, Users, Package, Briefcase } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { CartItem, Customer, SaleDraft, PaymentDetail, SaleOrigin, ConsumerType } from '../../utils/types';
+import { CartItem, Customer, SaleDraft, PaymentDetail, SaleOrigin, ConsumerType, VentaRPC } from '../../utils/types';
 import { calculateSubtotal, calculateTax, calculateTotal, formatCurrency } from '../../utils/calculations';
 import { useAuth } from '../../context/AuthContext';
-import { registrarVenta } from '../../utils/api';
+import { actualizarPresupuestoVenta, registrarVenta } from '../../utils/api';
 import { saveDraft, deleteDraft, getDrafts } from '../../utils/draft';
 import { v4 as uuidv4 } from 'uuid';
 import { useReactToPrint } from 'react-to-print'
 import logo from './img/Plip.png';
 import '../../index.css'
+import { PresupuestoSearch } from './PresupuestoSearch';
+import { mapVentaRPC } from '../../utils/mappers';
 
 
 interface NewSaleModalProps {
@@ -43,6 +45,9 @@ export const NewSaleModal: React.FC<NewSaleModalProps> = ({ isOpen, onClose }) =
   const [total, setTotal] = useState(0);
   const [mostrar, setMostrar] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
+
+  const [selectedPresupuestoId, setSelectedPresupuestoId] = useState<number | null>(null);
+
 
   useEffect(() => {
     const newSubtotal = calculateSubtotal(cartItems);
@@ -115,7 +120,24 @@ const handleSaveSale = async () => {
       dbTaxType = 'con_iva';
     }
 
+if (selectedPresupuestoId) {
 
+  if (!payments.length) {
+    alert('Debés agregar al menos un método y monto de pago antes de convertir el presupuesto.');
+    return;
+  }
+  
+    try {
+      await actualizarPresupuestoVenta(selectedPresupuestoId, payments);
+      alert(`Presupuesto #${selectedPresupuestoId} convertido en venta`);
+      handleReset();
+    } catch (e: any) {
+      console.error(e);
+      alert(`Error al actualizar presupuesto: ${e.message}`);
+    }
+    return;
+  }
+  
   const ventaParams = {
     p_cliente_id: customer ? Number(customer.id) : 1,
     p_origen: saleOrigin,
@@ -187,6 +209,32 @@ const handleLoadDraft = (draft: SaleDraft) => {
   setEstadoVenta('entregado')
 };
 
+// 1. al principio del componente:
+const loadPresupuesto = (v: VentaRPC) => {
+  setSelectedPresupuestoId(v.id);
+  // Si ya tenés mapVentaRPC, la podés usar:
+  const {
+    items,
+    payments,
+    customer,
+    origen,
+    consumerType,
+    estado,
+    tipo_iva
+  } = mapVentaRPC(v);
+
+  setCartItems(items);
+  setPayments(payments);
+  setCustomer(customer);
+  setSaleOrigin(origen);
+  setConsumerType(consumerType);
+  setEstadoVenta(estado);
+  setTaxType(
+    tipo_iva === 'medio_iva' ? '10.5' :
+    tipo_iva === 'con_iva'   ? '21'   :
+    'sin_iva'
+  );
+};
 
 
 const handlePrint = useReactToPrint({
@@ -371,7 +419,8 @@ const handlePrint = useReactToPrint({
         </div>       
         </div>
         
-        
+        <PresupuestoSearch onSelect={loadPresupuesto} />
+
 
         {/* Product Search */}
         <div className="w-1/3">

@@ -15,14 +15,14 @@ import { useReactToPrint } from 'react-to-print';
 
 export const InventoryPage: React.FC = () => {
 
-  const [inventory, setInventory] = useState<InventoryItemAd[]>([]);
-    const [searchTerm, setSearchTerm] = useState('');
-  const [stockFilter, setStockFilter] = useState<'all' | 'in-stock' | 'low-stock' | 'out-of-stock'>('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(100);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<InventoryItemAd | null>(null);
-  const [categoria, setCategoria] = useState<string | null>(null);
+const [inventory, setInventory] = useState<InventoryItemAd[]>([]);
+const [searchTerm, setSearchTerm] = useState('');
+const [stockFilter, setStockFilter] = useState<'all' | 'in-stock' | 'low-stock' | 'out-of-stock'>('all');
+const [currentPage, setCurrentPage] = useState(1);
+const [itemsPerPage] = useState(100);
+const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+const [selectedItem, setSelectedItem] = useState<InventoryItemAd | null>(null);
+const [categoria, setCategoria] = useState<string | null>(null);
 const [subcategoria, setSubcategoria] = useState<string | null>(null);
 const [rubro, setRubro] = useState<string | null>(null);
 const [temporada, setTemporada] = useState<string | null>(null);
