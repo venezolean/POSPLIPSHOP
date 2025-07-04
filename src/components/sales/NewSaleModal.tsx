@@ -122,7 +122,7 @@ const handleSaveSale = async () => {
 
 if (selectedPresupuestoId) {
 
-  if (!payments.length) {
+  if (!selectedPresupuestoId ||  !payments.length) {
     alert('Debés agregar al menos un método y monto de pago antes de convertir el presupuesto.');
     return;
   }
@@ -262,6 +262,7 @@ const handlePrint = useReactToPrint({
     setPayments([]);
     setResetKey(prev => prev + 1); // fuerza reinicio interno
     setEstadoVenta('entregado')
+    setSelectedPresupuestoId(null);
   };
 
   const originOptions = [
@@ -416,11 +417,15 @@ const handlePrint = useReactToPrint({
             />
 
           </Card>
-        </div>       
+
+        </div>  
+          
+          {/* Product Search */}
+        <div className="flex-1/2 w-1/3 justify-start">
+          <PresupuestoSearch onSelect={loadPresupuesto} />
+        </div>     
         </div>
         
-        <PresupuestoSearch onSelect={loadPresupuesto} />
-
 
         {/* Product Search */}
         <div className="w-1/3">
