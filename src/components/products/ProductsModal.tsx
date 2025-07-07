@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
@@ -13,6 +13,25 @@ interface NewProductModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+ // ahora: claves (value) en minúsculas y mapping a categorías permitidas
+ const rubros = [
+   'logistica',
+   'papeleria',
+   'hogar_cuidado_personal',
+   'deporte_y_bienestar',
+   'otros',
+   'kit'
+ ];
+
+ const categoriasPorRubro: Record<string, string[]> = {
+   logistica: ['Embalaje'],
+   papeleria: ['Papeleria Oficina', 'Encuadernacion'],
+   hogar_cuidado_personal: ['Blanqueria', 'Higiene', 'Hogar',' Perfumeria'],
+   deporte_y_bienestar: ['Yoga y Fitness'],
+   otros: ['Otros'],
+ };
+const tempdevent =['Todo el año', 'Otoño', 'Verano','Primavera','Invierno','Festividades' ];
 
 export const NewProductModal: React.FC<NewProductModalProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
@@ -41,6 +60,18 @@ export const NewProductModal: React.FC<NewProductModalProps> = ({ isOpen, onClos
     setVariants(newVariants);
     setIsVariantsModalOpen(false);
   };
+
+ // Cuando cambie el rubro, reseteamos la categoría
+ useEffect(() => {
+   setCategoria('');
+ }, [p_rubro]);
+
+ // Listado filtrado según rubro seleccionado
+ const categoriasDisponibles = p_rubro
+   ? categoriasPorRubro[p_rubro] || []
+   : [];
+
+
 
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -151,13 +182,73 @@ const resetForm = () => {
             <Input label="Código de barras" value={p_codigo_barras} onChange={(e) => setCodigoBarras(e.target.value)} fullWidth />
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <Input label="Rubro" value={p_rubro} onChange={(e) => setRubro(e.target.value)} fullWidth />
-            <Input label="Categoría" value={p_categoria} onChange={(e) => setCategoria(e.target.value)} fullWidth />
+      <div className="grid grid-cols-2 gap-4">
+            {/* Rubro */}
+            <div className="flex flex-col">
+              <label htmlFor="rubro" className="mb-1 text-sm font-medium text-gray-700">
+                Rubro
+              </label>
+              <select
+                id="rubro"
+                value={p_rubro}
+                onChange={e => setRubro(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="" disabled>
+                  — Seleccioná un rubro —
+                </option>
+                {rubros.map(r => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Categoría dependiente */}
+            <div className="flex flex-col">
+              <label htmlFor="categoria" className="mb-1 text-sm font-medium text-gray-700">
+                Categoría
+              </label>
+              <select
+                id="categoria"
+                value={p_categoria}
+                onChange={e => setCategoria(e.target.value)}
+                disabled={!p_rubro}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="" disabled>— Seleccioná una categoría —</option>
+                {categoriasDisponibles.map(c => (
+                  <option key={c} value={c}>
+                    {c.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Input label="Tiempo de vencimiento (días)" type="number" value={p_tiempo_vencimiento} onChange={(e) => setTiempoVencimiento(parseInt(e.target.value))} fullWidth />
-            <Input label="Temporada de venta" value={p_temporada_venta} onChange={(e) => setTemporadaVenta(e.target.value)} fullWidth />
+            {/* Temporada de venta */}
+            <div className="flex flex-col">
+              <label htmlFor="temporada_venta" className="mb-1 text-sm font-medium text-gray-700">
+                Temporada de Venta
+              </label>
+              <select
+                id="temporada_venta"
+                value={p_temporada_venta}
+                onChange={e => setTemporadaVenta(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="" disabled>
+                  — Seleccioná una categoría —
+                </option>
+                {tempdevent.map(t => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <Card className="p-4">
             <div className="flex justify-between items-center mb-4">
