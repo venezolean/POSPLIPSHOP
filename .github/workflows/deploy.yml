@@ -7,6 +7,9 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
 
     steps:
     - name: Checkout
@@ -20,7 +23,6 @@ jobs:
 
     - name: Build & test frontend
       run: |
-        cd app
         npm ci
         npm run build
       env:
@@ -30,11 +32,11 @@ jobs:
     - name: Copy compose & configs to server
       run: |
         rsync -avz --delete \
-          docker-compose.yml app/Dockerfile docker/nginx/ edwin@${{ secrets.DEPLOY_HOST }}:/var/docker/posplipshop/
+          docker-compose.yml app/Dockerfile docker/nginx/ "${DEPLOY_USER}@${DEPLOY_HOST}:/var/docker/posplipshop/"
 
     - name: Deploy on server
       run: |
-        ssh -o StrictHostKeyChecking=no edwin@${{ secrets.DEPLOY_HOST }} << 'EOF'
+        ssh -o StrictHostKeyChecking=no "${DEPLOY_USER}@${DEPLOY_HOST}" << 'EOF'
           cd /var/docker/posplipshop
           docker-compose pull
           docker-compose up -d --build
