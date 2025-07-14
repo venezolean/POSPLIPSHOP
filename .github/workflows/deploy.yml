@@ -1,0 +1,41 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+
+    - name: Build & test frontend
+      run: |
+        cd app
+        npm ci
+        npm run build
+      env:
+        VITE_SUPABASE_URL: ${{ secrets.SITE_URL }}
+        VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+    - name: Copy compose & configs to server
+      run: |
+        rsync -avz --delete \
+          docker-compose.yml app/Dockerfile docker/nginx/ edwin@${{ secrets.DEPLOY_HOST }}:/var/docker/posplipshop/
+
+    - name: Deploy on server
+      run: |
+        ssh -o StrictHostKeyChecking=no edwin@${{ secrets.DEPLOY_HOST }} << 'EOF'
+          cd /var/docker/posplipshop
+          docker-compose pull
+          docker-compose up -d --build
+        EOF
