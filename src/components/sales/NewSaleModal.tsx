@@ -334,7 +334,7 @@ const handlePrint = useReactToPrint({
           
           <>
           {/* Sale Origin */}
-          <Card className="h 1/2"> <h4 className="text-xs font-semibold mb-1">Procedenciaa</h4>
+          <Card className="h 1/2"> <h4 className="text-xs font-semibold mb-1">Procedencias</h4>
             <div className="flex gap-1 justify-center">
               {originOptions.map((option) => (
                 <div key={option.value} className="relative group overflow-visible">
