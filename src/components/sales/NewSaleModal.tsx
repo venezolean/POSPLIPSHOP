@@ -505,7 +505,7 @@ const handlePrint = useReactToPrint({
                 onClick={handlePrint}
                 className="gap-0 sm:gap-2"
               >
-                <span className="hidden sm:inline">Imprimir</span>
+                <span className="hidden sm:inline">Imprimiras</span>
               </Button>
                                     
               <Button
