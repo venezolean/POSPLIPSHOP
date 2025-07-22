@@ -1,6 +1,6 @@
 // src/utils/api.ts
 import { supabase } from '../lib/supabase';
-import type {ProductoRegistro, ProductoBusqueda, RegistrarVentaParams, InventoryItemAd, Customer, VentaRPC, PaymentDetail } from './types';
+import type {ProductoRegistro, ProductoBusqueda, RegistrarVentaParams, InventoryItemAd, Customer, VentaRPC, PaymentDetail, CierreCaja } from './types';
 
 export async function fetchSuggestions(term: string): Promise<ProductoBusqueda[]> {
   const { data, error } = await supabase
@@ -231,4 +231,74 @@ export async function actualizarPresupuestoVenta(
     .insert(pagosInsert);
 
   if (errP) throw errP;
+}
+
+
+
+// trae la última apertura (o falla si no existe)
+export async function getAperturaCaja(userId: string) {
+  const { data, error } = await supabase
+    .from('apertura_caja')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+  if (error) throw error;
+  return data as { monto: number; created_at: string };
+}
+
+export async function registrarAperturaCaja({
+  userId,
+  monto,
+}: {
+  userId: string;
+  monto: number;
+}) {
+  const { data, error } = await supabase
+    .from('apertura_caja')
+    .insert({ user_id: userId, monto });
+  if (error) throw error;
+  return data;
+}
+
+
+export async function getCierreCaja(userId: string): Promise<CierreCaja> {
+  // 1) Llamás al RPC sin genéricos
+  const { data, error } = await supabase
+    .rpc('get_cierre_caja', { p_user_id: userId })
+
+  // 2) Manejo de error
+  if (error) {
+    console.error('[getCierreCaja] RPC error:', error)
+    throw new Error(error.message)
+  }
+
+  // 3) Cast y validación de datos
+  const rows = (data as CierreCaja[]) ?? []
+  if (rows.length === 0) {
+    throw new Error('No se encontró cierre de caja para este usuario.')
+  }
+
+  // 4) Devolvés el primer (y único) registro
+  return rows[0]
+}
+
+
+
+export async function registrarCierreCaja({
+  userId,
+  amount,
+}: {
+  userId: string;
+  amount: number;
+}): Promise<void> {
+  const { error } = await supabase.rpc('registrar_cierre_caja', {
+    p_user_id: userId,
+    p_monto_cierre: amount,
+  });
+  if (error) {
+    console.error('[registrarCierreCaja] RPC error:', error);
+    throw error;
+  }
 }

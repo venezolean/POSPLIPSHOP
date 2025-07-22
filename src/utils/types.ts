@@ -177,3 +177,22 @@ export interface VentaRPC {
     monto: number;
   }[];
 }
+
+
+// types/cierreCaja.ts
+export interface Desglose {
+  [key: string]: {
+    cantidad: number;
+    monto: number;
+  };
+}
+
+export interface CierreCaja {
+  inicio: string;             // ISO timestamp
+  fin: string;                // ISO timestamp
+  monto_apertura: number;
+  ventas_origen: Desglose;
+  ventas_consumidor: Desglose;
+  ventas_estado: Desglose;
+  pagos_metodo: Desglose;
+}

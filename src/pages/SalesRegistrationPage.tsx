@@ -6,16 +6,40 @@ import { CustomersModal } from '../components/customers/CustomersModal';
 import { SalesHistoryModal } from '../components/sales/SalesHistoryModal';
 import { NewProductModal } from '../components/products/ProductsModal';
 import { useNavigate } from 'react-router-dom';
+import { AperturaModal } from '../components/sales/AperturaModal';
+import { getCierreCaja } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
+
 
 export const SalesRegistrationPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth()
   const [isSaleModalOpen, setIsSaleModalOpen] = useState(false);
   const [isCustomersModalOpen, setIsCustomersModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [isAperturaModalOpen, setIsAperturaModalOpen] = useState(false)
+  const handleAperturaConfirmed = () => {
+    setIsAperturaModalOpen(false)
+    setIsSaleModalOpen(true)
+  }
+
+
+    const handleStartSale = async () => {
+    if (!user) return
+    try {
+      // Si ya hay apertura, abre directamente el POS
+      await getCierreCaja(String(user.id))
+      setIsSaleModalOpen(true)
+    } catch {
+      // Si no hay, pide primero monto de apertura
+      alert('No hay apertura de caja activa. Primero registrá el monto de apertura.')
+      setIsAperturaModalOpen(true)
+    }
+  }
 
   const gridItems = [
-    { id: 'venta', icon: <ShoppingBag size={48} />, onClick: () => setIsSaleModalOpen(true) },
+    { id: 'venta', icon: <ShoppingBag size={48} />, onClick: handleStartSale  },
     { id: 'producto', icon: <Package size={48} />, onClick: () => setIsProductModalOpen(true) },
     { id: 'clientes', icon: <Users size={48} />, onClick: () => setIsCustomersModalOpen(true) },
     { id: 'historial', icon: <History size={48} />, onClick: () => setIsHistoryModalOpen(true) },
@@ -49,6 +73,7 @@ export const SalesRegistrationPage: React.FC = () => {
       </div>
 
       {/* Modales */}
+      <AperturaModal  isOpen={isAperturaModalOpen}  onClose={() => setIsAperturaModalOpen(false)}  onConfirmed={handleAperturaConfirmed} />
       <NewSaleModal isOpen={isSaleModalOpen} onClose={() => setIsSaleModalOpen(false)} />
       <CustomersModal isOpen={isCustomersModalOpen} onClose={() => setIsCustomersModalOpen(false)} />
       <SalesHistoryModal isOpen={isHistoryModalOpen} onClose={() => setIsHistoryModalOpen(false)} />

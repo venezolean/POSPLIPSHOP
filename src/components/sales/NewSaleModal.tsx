@@ -7,10 +7,10 @@ import { CustomerSearch } from '../customers/CustomerSearch';
 import { Card } from '../ui/Card';
 import { Save, Printer, RefreshCw, ShoppingBag, Globe, Smartphone, ShoppingCart, User, Users, Package, Briefcase } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { CartItem, Customer, SaleDraft, PaymentDetail, SaleOrigin, ConsumerType, VentaRPC } from '../../utils/types';
+import { CartItem, Customer, SaleDraft, PaymentDetail, SaleOrigin, ConsumerType, VentaRPC, CierreCaja } from '../../utils/types';
 import { calculateSubtotal, calculateTax, calculateTotal, formatCurrency } from '../../utils/calculations';
 import { useAuth } from '../../context/AuthContext';
-import { actualizarPresupuestoVenta, registrarVenta } from '../../utils/api';
+import { actualizarPresupuestoVenta, registrarVenta, getAperturaCaja, registrarAperturaCaja, getCierreCaja, registrarCierreCaja } from '../../utils/api';
 import { saveDraft, deleteDraft, getDrafts } from '../../utils/draft';
 import { v4 as uuidv4 } from 'uuid';
 import { useReactToPrint } from 'react-to-print'
@@ -37,6 +37,10 @@ export const NewSaleModal: React.FC<NewSaleModalProps> = ({ isOpen, onClose }) =
   const [resetKey, setResetKey] = useState(0);
   const [drafts, setDrafts] = useState<SaleDraft[]>([]);
   const [estadoVenta, setEstadoVenta] = useState('entregado'); // o 'pagado' si querés mantener el valor por defecto
+  const [showCierre, setShowCierre] = useState(false);
+  const [cierreData, setCierreData] = useState<CierreCaja | null>(null);
+  const [closeAmount, setCloseAmount] = useState<number>(0);
+  
 
 
   const [subtotal, setSubtotal] = useState(0);
@@ -170,6 +174,47 @@ const ventaId = await registrarVenta(ventaParams);
   console.log('Objeto ventaParams a enviar:', ventaParams);
   
 };
+
+ // Cerrar caja
+  // 1) Vista previa de cierre (no persiste)
+  const previewCierre = async () => {
+      // 1) Pedimos el código
+  const codigo = window.prompt('Ingrese el código de autorización:');
+  if (codigo !== 'Sisi quiero cerrar la caja') {
+    alert('Código incorrecto');
+    return;
+  }
+
+    if (!user) return;
+    try {
+      const cierre = await getCierreCaja(String(user.id));
+      setCierreData(cierre);
+      setCloseAmount(cierre.monto_apertura);
+      setShowCierre(true);
+    } catch (e: any) {
+      console.error(e);
+      alert(`Error al obtener datos de cierre: ${e.message}`);
+    }
+  };
+
+  // 2) Confirmar y persistir el cierre
+  const confirmCierre = async () => {
+  if (!user) return;
+  try {
+    await registrarCierreCaja({
+      userId: String(user.id),
+      amount: closeAmount,    // <--- le pasás el monto que tipeaste
+    });
+    setShowCierre(false);
+    alert('Cierre registrado correctamente: ' + formatCurrency(closeAmount));
+    handleReset ();
+    onClose();
+  } catch (e: any) {
+    console.error(e);
+    alert(`Error al registrar cierre: ${e.message}`);
+  }
+};
+
 
 const handleSaveDraft = () => {
   if (cartItems.length === 0) {
@@ -423,7 +468,7 @@ const handlePrint = useReactToPrint({
           {/* Product Search */}
         <div className="flex-1/2 w-1/3 justify-start">
           <PresupuestoSearch onSelect={loadPresupuesto} />
-        </div>     
+        </div>
         </div>
         
 
@@ -542,6 +587,8 @@ const handlePrint = useReactToPrint({
                 <span className="hidden sm:inline">Consigna</span>
               </Button>
 
+          <Button onClick={previewCierre} variant="outline">Cerrar Caja</Button>
+ 
             </div>
           </Card>
           
@@ -685,6 +732,96 @@ const handlePrint = useReactToPrint({
                   </footer>
                 </div>
               </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    {/* Modal de Cierre */}
+    {showCierre && cierreData && (
+      <Modal
+        isOpen={showCierre}
+        onClose={() => {
+          setShowCierre(false);
+          setCierreData(null);
+          setCloseAmount(0);
+        }}
+        title="Cierre de Caja"
+      >
+        {(() => {
+          const {
+            inicio,
+            fin,
+            monto_apertura,
+            ventas_origen ={},
+            pagos_metodo = {}
+          } = cierreData
+
+          // total de ventas
+          const totalVentas = Object.values(ventas_origen)
+            .reduce((acc, obj) => acc + ((obj && obj.monto) ?? 0), 0)
+
+          // montos por método de pago
+          const efe = pagos_metodo.efectivo?.monto ?? 0
+          const tar = pagos_metodo.tarjeta?.monto ?? 0
+          const trf = pagos_metodo.transferencia?.monto ?? 0
+
+          return (
+            <div className="p-4 space-y-2 text-sm">
+              <p>
+                <strong>Inicio:</strong>{' '}
+                {new Date(inicio).toLocaleString()}
+              </p>
+              <p>
+                <strong>Fin:</strong>{' '}
+                {new Date(fin).toLocaleString()}
+              </p>
+              <p>
+                <strong>Apertura:</strong>{' '}
+                {formatCurrency(monto_apertura)}
+              </p>
+              <p>
+                <strong>Total Ventas:</strong>{' '}
+                {formatCurrency(totalVentas)}
+              </p>
+              <p>
+                <strong>Efectivo:</strong>{' '}
+                {formatCurrency(efe)}
+              </p>
+              <p>
+                <strong>Caja Final:</strong>{' '}
+                {formatCurrency(monto_apertura + efe)}
+              </p>
+            </div>
+          )
+        })()}
+        <div>
+          <label className="block text-sm font-medium">Monto de Cierre</label>
+          <input
+            type="number"
+            className="mt-1 block w-full p-2 border rounded"
+            value={closeAmount}
+            onChange={e => setCloseAmount(parseFloat(e.target.value) || 0)}
+            min="0"
+          />
+        </div>
+        <div className="mt-4 flex justify-end gap-2">
+          <Button onClick={confirmCierre}>Confirmar Cierre</Button>
+          <Button variant="outline" onClick={() => setShowCierre(false)}>
+            Cancelar
+          </Button>
+        </div>
+      </Modal>
+    )}
+
     </Modal>
     
   );
