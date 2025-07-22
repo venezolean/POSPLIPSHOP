@@ -10,7 +10,7 @@ import { Button } from '../ui/Button';
 import { CartItem, Customer, SaleDraft, PaymentDetail, SaleOrigin, ConsumerType, VentaRPC, CierreCaja } from '../../utils/types';
 import { calculateSubtotal, calculateTax, calculateTotal, formatCurrency } from '../../utils/calculations';
 import { useAuth } from '../../context/AuthContext';
-import { actualizarPresupuestoVenta, registrarVenta, getAperturaCaja, registrarAperturaCaja, getCierreCaja, registrarCierreCaja } from '../../utils/api';
+import { actualizarPresupuestoVenta, registrarVenta, getCierreCaja, registrarCierreCaja } from '../../utils/api';
 import { saveDraft, deleteDraft, getDrafts } from '../../utils/draft';
 import { v4 as uuidv4 } from 'uuid';
 import { useReactToPrint } from 'react-to-print'
@@ -18,6 +18,7 @@ import logo from './img/Plip.png';
 import '../../index.css'
 import { PresupuestoSearch } from './PresupuestoSearch';
 import { mapVentaRPC } from '../../utils/mappers';
+import { SuggestionModal } from './SuggestionBox';
 
 
 interface NewSaleModalProps {
@@ -40,6 +41,7 @@ export const NewSaleModal: React.FC<NewSaleModalProps> = ({ isOpen, onClose }) =
   const [showCierre, setShowCierre] = useState(false);
   const [cierreData, setCierreData] = useState<CierreCaja | null>(null);
   const [closeAmount, setCloseAmount] = useState<number>(0);
+  const [isSugModalOpen, setIsSugModalOpen] = useState(false);
   
 
 
@@ -465,7 +467,7 @@ const handlePrint = useReactToPrint({
 
         </div>  
           
-          {/* Product Search */}
+          {/* presupuesto Search */}
         <div className="flex-1/2 w-1/3 justify-start">
           <PresupuestoSearch onSelect={loadPresupuesto} />
         </div>
@@ -475,6 +477,13 @@ const handlePrint = useReactToPrint({
         {/* Product Search */}
         <div className="w-1/3">
           <ProductSearch onAddToCart={handleAddToCart} />
+           <>
+            <Button onClick={() => setIsSugModalOpen(true)}>Dejar Sugerencia</Button>
+              <SuggestionModal 
+                isOpen={isSugModalOpen} 
+                onClose={() => setIsSugModalOpen(false)} 
+              />
+            </>
         </div>
 
         {/* Products Table */}
@@ -771,8 +780,6 @@ const handlePrint = useReactToPrint({
 
           // montos por método de pago
           const efe = pagos_metodo.efectivo?.monto ?? 0
-          const tar = pagos_metodo.tarjeta?.monto ?? 0
-          const trf = pagos_metodo.transferencia?.monto ?? 0
 
           return (
             <div className="p-4 space-y-2 text-sm">

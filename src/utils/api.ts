@@ -1,6 +1,6 @@
 // src/utils/api.ts
 import { supabase } from '../lib/supabase';
-import type {ProductoRegistro, ProductoBusqueda, RegistrarVentaParams, InventoryItemAd, Customer, VentaRPC, PaymentDetail, CierreCaja } from './types';
+import type {ProductoRegistro, ProductoBusqueda, RegistrarVentaParams, InventoryItemAd, Customer, VentaRPC, PaymentDetail, CierreCaja, Sugerencia } from './types';
 
 export async function fetchSuggestions(term: string): Promise<ProductoBusqueda[]> {
   const { data, error } = await supabase
@@ -301,4 +301,53 @@ export async function registrarCierreCaja({
     console.error('[registrarCierreCaja] RPC error:', error);
     throw error;
   }
+}
+
+
+// notas y sugerencias
+
+
+export async function crearSugerencia(params: {
+  userId?: string;
+  contexto: Record<string, any>;
+  nota: string;
+}): Promise<Sugerencia | null> {
+  console.debug('🔔 crearSugerencia called with:', params);
+  const { data, error } = await supabase
+    .from('sugerencias')
+    .insert({
+      user_id: params.userId ?? null,
+      contexto: params.contexto,
+      nota: params.nota,
+    })
+    .select('*') 
+    .single();
+    
+
+  if (error) {
+    console.error('❌ Error creando sugerencia:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      params,
+    });
+    return null;
+  }
+
+  console.debug('✅ sugerencia creada:', data);
+  return data as Sugerencia;
+}
+
+
+export async function fetchSugerencias(): Promise<Sugerencia[]> {
+  const { data, error } = await supabase
+    .from('sugerencias')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error al obtener sugerencias:', error);
+    return [];
+  }
+  return data as Sugerencia[];
 }

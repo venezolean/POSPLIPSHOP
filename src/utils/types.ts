@@ -196,3 +196,17 @@ export interface CierreCaja {
   ventas_estado: Desglose;
   pagos_metodo: Desglose;
 }
+
+
+
+// sugerencia
+
+export type Sugerencia = {
+  id: string;
+  user_id?: string;
+  contexto: Record<string, any>;
+  nota: string;
+  created_at: string;
+  procesada: boolean;
+  procesada_at?: string;
+};
