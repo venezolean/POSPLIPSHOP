@@ -39,13 +39,13 @@ export const VariantsModal: React.FC<VariantsModalProps> = ({ isOpen, onClose, o
   const handleAddValue = (key: string) => {
     if (!tempNombre.trim()) return;
     const fullValue = {
-      nombre: tempNombre,
-      precio: tempPrecio,
-      codigo_barras: tempCodigoBarras,
-      link: tempLink,
-      unidades_por_paquete: tempUnidadesPorPaquete,
-      paquetes_por_caja: tempPaquetesPorCaja,
-      stockv: tempStockv,
+      nombre: tempNombre || 'Sin nombre',
+      precio: tempPrecio || 0,
+      codigo_barras: tempCodigoBarras || '',
+      link: tempLink || null,
+      unidades_por_paquete: tempUnidadesPorPaquete || 1,
+      paquetes_por_caja: tempPaquetesPorCaja || 1,
+      stockv: tempStockv || 0,
     };
     const valueString = JSON.stringify(fullValue);
     setSelectedVariants(prev => ({
@@ -145,6 +145,7 @@ export const VariantsModal: React.FC<VariantsModalProps> = ({ isOpen, onClose, o
                       value={tempNombre}
                       onChange={e => setTempNombre(e.target.value)}
                       placeholder="Característica"
+                      required
                     />
                     <Input
                       value={tempPrecio}
@@ -153,35 +154,10 @@ export const VariantsModal: React.FC<VariantsModalProps> = ({ isOpen, onClose, o
                       placeholder="Precio"
                     />
                     <Input
-                      value={tempCodigoBarras}
-                      onChange={e => setTempCodigoBarras(e.target.value)}
-                      placeholder="Código de barras"
-                    />
-                    <Input
-                      value={tempLink}
-                      onChange={e => setTempLink(e.target.value)}
-                      placeholder="Link"
-                    />
-                    <Input
-                      value={tempUnidadesPorPaquete}
-                      type="number"
-                      onChange={e => setTempUnidadesPorPaquete(e.target.value)}
-                      placeholder="Unidades por paquete"
-                      required
-                    />
-                    <Input
-                      value={tempPaquetesPorCaja}
-                      type="number"
-                      onChange={e => setTempPaquetesPorCaja(e.target.value)}
-                      placeholder="Paquetes por caja"
-                      required
-                    />
-                    <Input
                       value={tempStockv}
                       type="number"
                       onChange={e => setTempStockv(e.target.value)}
                       placeholder="Stock"
-                      required
                     />
                   </div>
                   <Button onClick={() => handleAddValue(key)} icon={<Plus size={16} />}>

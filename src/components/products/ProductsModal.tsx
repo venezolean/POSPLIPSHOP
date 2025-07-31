@@ -88,26 +88,27 @@ const handleSubmit = async (e: React.FormEvent) => {
   }
 
   const data: ProductoRegistro = {
-    p_nombre_principal,
-    p_proveedor_id,
-    p_caracteristicas: formattedVariants,
-    p_nombre_proveedor,
-    p_nombre_ml,
-    p_nombre_exportador,
-    p_garantia,
-    p_unidades_por_paquete,
-    p_paquetes_por_caja,
-    p_cajas_por_pallet,
-    p_foto_url,
-    p_rubro,
-    p_categoria,
-    p_subcategoria,
-    p_perecedero,
-    p_tiempo_vencimiento,
-    p_temporada_venta,
-    p_codigo_barras,
-    p_user_id: String(user?.id ?? '')
-  };
+  p_nombre_principal: p_nombre_principal?.trim() || 'Sin nombre',
+  p_proveedor_id: p_proveedor_id ?? 1,
+  p_caracteristicas: formattedVariants ?? {},
+  p_nombre_proveedor: p_nombre_proveedor || p_nombre_principal || 'Sin nombre',
+  p_nombre_ml: p_nombre_ml || p_nombre_principal || 'Sin nombre',
+  p_nombre_exportador: p_nombre_exportador || p_nombre_principal || 'Sin nombre',
+  p_garantia: p_garantia || false,
+  p_unidades_por_paquete: p_unidades_por_paquete ?? 1,
+  p_paquetes_por_caja: p_paquetes_por_caja ?? 1,
+  p_cajas_por_pallet: p_cajas_por_pallet ?? 1,
+  p_foto_url: p_foto_url || '',
+  p_rubro: p_rubro || '',
+  p_categoria: p_categoria || '',
+  p_subcategoria: p_subcategoria || '',
+  p_perecedero: p_perecedero ?? false,
+  p_tiempo_vencimiento: p_tiempo_vencimiento ?? 0,
+  p_temporada_venta: p_temporada_venta || '',
+  p_codigo_barras: p_codigo_barras || `${p_nombre_principal?.trim().toLowerCase().replace(/\s+/g, '-')}-${Math.floor(1000 + Math.random() * 9000)}`,
+  p_user_id: String(user?.id ?? '')
+};
+
 
   const id = await registrarProducto(data);
 
@@ -173,15 +174,6 @@ const resetForm = () => {
       >
         <form id="product-form" onSubmit={handleSubmit} className="space-y-4">
           <Input label="Nombre del producto" value={p_nombre_principal} onChange={(e) => setNombrePrincipal(e.target.value)} required fullWidth />
-          <div className="grid grid-cols-2 gap-4">
-            <Input label="Nombre para proveedor" value={p_nombre_proveedor} onChange={(e) => setNombreProveedor(e.target.value)} required fullWidth />
-            <Input label="Nombre ML" value={p_nombre_ml} onChange={(e) => setNombreML(e.target.value)} required fullWidth />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Input label="Nombre exportador" value={p_nombre_exportador} onChange={(e) => setNombreExportador(e.target.value)} required fullWidth />
-            <Input label="Código de barras" value={p_codigo_barras} onChange={(e) => setCodigoBarras(e.target.value)} fullWidth />
-          </div>
-
       <div className="grid grid-cols-2 gap-4">
             {/* Rubro */}
             <div className="flex flex-col">

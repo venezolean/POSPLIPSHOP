@@ -181,9 +181,9 @@ const ventaId = await registrarVenta(ventaParams);
   // 1) Vista previa de cierre (no persiste)
   const previewCierre = async () => {
       // 1) Pedimos el código
-  const codigo = window.prompt('Ingrese el código de autorización:');
-  if (codigo !== 'Sisi quiero cerrar la caja') {
-    alert('Código incorrecto');
+  const codigo = window.prompt('Ingrese el código de autorización:')?.trim();
+  if (codigo !== '0411') {
+    alert('Código PUTO');
     return;
   }
 
@@ -283,6 +283,21 @@ const loadPresupuesto = (v: VentaRPC) => {
   );
 };
 
+const handleSetMLZeroPrice = () => {
+  const updatedItems = cartItems.map((item) => ({
+    ...item,
+    price: 0,
+    subtotal: 0,
+  }));
+  setCartItems(updatedItems);
+  setSaleOrigin('Mercado_libre');
+};
+
+const handleMLVenta = async () => {
+  handleSetMLZeroPrice();
+  await new Promise((r) => setTimeout(r, 0)); // deja que React actualice
+  handleSaveSale();
+};
 
 const handlePrint = useReactToPrint({
     contentRef: printRef,
@@ -598,6 +613,16 @@ const handlePrint = useReactToPrint({
 
           <Button onClick={previewCierre} variant="outline">Cerrar Caja</Button>
  
+
+              <Button
+                variant="warning"
+                size="sm"
+                onClick={handleMLVenta}
+                className="gap-0 sm:gap-2"
+              >
+                ML Precio $0 + Guardar
+              </Button>
+
             </div>
           </Card>
           
